@@ -6,6 +6,7 @@ import lab.util.packet.PacketOverflowException;
 
 import static lab.util.packet.PacketSettings.*;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -19,12 +20,27 @@ public class Main {
 
     private static boolean working = true;
     private static final String ADDRESS = "localhost";
-    private static final int PORT = 30368;
-    private static InetSocketAddress inetAddress = new InetSocketAddress(ADDRESS, PORT);
+    private static int PORT;
+    private static InetSocketAddress inetAddress;
     private static DatagramChannel channel = null;
     private static int countOfAttempts = 5;
 
     public static void main(String[] args) {
+
+        try {
+            int port;
+            if ((args.length > 0) && ((port = Integer.parseInt(args[0])) >= 0) && (port < 65536)) {
+                PORT = port;
+            }
+            else {
+                System.out.println("Введите корректный порт.");
+                System.exit(0);
+            }
+        }
+        catch (NumberFormatException e){
+            System.out.println("Введите корректный порт.");
+            System.exit(0);
+        }
 
         Scanner commandsScanner = new Scanner(System.in);
 
@@ -34,6 +50,8 @@ public class Main {
         } catch (IOException e) {
 
         }
+
+        inetAddress = new InetSocketAddress(ADDRESS, PORT);
 
         main: while(working) {
 

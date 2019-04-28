@@ -20,13 +20,29 @@ public class RunServer {
 
     private static boolean working = true;
     private static DatagramSocket socket;
-    private static final int PORT = 30368;
+    private static int PORT;
     private static final String filePath = System.getenv("LAB_FIVE");
 
     private static HashMap<ClientID, ArrayList<DatagramPacket>> packetsParts = new HashMap<>();
-    private static CollectionElementsManager collectionManager = new CollectionElementsManager(filePath);
+    private static CollectionElementsManager collectionManager;
 
     public static void main(String[] args) {
+
+        try {
+            int port;
+            if ((args.length > 0) && ((port = Integer.parseInt(args[0])) >= 0) && (port < 65536)) {
+                PORT = port;
+            }
+            else {
+                System.out.println("Введите корректный порт.");
+                System.exit(0);
+            }
+        }
+        catch (NumberFormatException e){
+            System.out.println("Введите корректный порт.");
+            System.exit(0);
+        }
+
         SocketAddress address = new InetSocketAddress(PORT);
         try {
             socket = new DatagramSocket(null);
@@ -37,6 +53,8 @@ public class RunServer {
             System.out.println("Порт занят, сервер не может быть запущен");
             return;
         }
+
+        collectionManager = new CollectionElementsManager(filePath);
 
         while (working) {
 
