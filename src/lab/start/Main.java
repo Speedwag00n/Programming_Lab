@@ -24,6 +24,7 @@ public class Main {
     private static InetSocketAddress inetAddress;
     private static DatagramChannel channel = null;
     private static int countOfAttempts = 5;
+    private static int receivingTime = 500;
 
     public static void main(String[] args) {
 
@@ -158,13 +159,14 @@ public class Main {
         ArrayList<ByteBuffer> packetsParts = new ArrayList<>();
         int countOfPackets = -1;
         int receivedPackets = 0;
-        ByteBuffer response = null;
-        while (true) {
+        ByteBuffer response;
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < receivingTime) {
             ByteBuffer buffer = ByteBuffer.allocate(PACKET_LENGTH);
             try {
                 channel.receive(buffer);
                 if (buffer.position() == 0)
-                    break;
+                    continue;
                 receivedPackets++;
                 int currentPacketNumber = buffer.get(1) & 0xff;
                 if (receivedPackets == 1){
@@ -183,7 +185,6 @@ public class Main {
             catch (IOException e) {
 
             }
-
         }
         if (countOfPackets == receivedPackets){
             response = ByteBuffer.allocate(countOfPackets * (PACKET_LENGTH - METADATA_LENGTH));
