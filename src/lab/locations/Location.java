@@ -7,6 +7,8 @@ import lab.interfaces.Named;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -18,24 +20,24 @@ public class Location implements Named, ContainsItems, Comparable<Location>, Ser
     private ArrayList<Item> itemsList = new ArrayList<>();
     private int area;
     private RectanglePosition position;
-    private Date dateOfCreation;
+    private ZonedDateTime dateOfCreation;
 
     public Location(){
         System.out.println("Создана новая безымянная локация.");
     }
 
-    public Location(String aName, int aArea, RectanglePosition aPosition){
-        setName(aName);
-        area = aArea;
-        position = aPosition;
-        dateOfCreation = new Date();
+    public Location(String name, int area, RectanglePosition position){
+        setName(name);
+        this.area = area;
+        this.position = position;
+        this.dateOfCreation = ZonedDateTime.now();
     }
 
-    public Location(String aName, int aArea, RectanglePosition aPosition, long date){
-        setName(aName);
-        area = aArea;
-        position = aPosition;
-        dateOfCreation = new Date(date);
+    public Location(String name, int area, RectanglePosition position, ZonedDateTime dateOfCreation){
+        setName(name);
+        this.area = area;
+        this.position = position;
+        this.dateOfCreation = dateOfCreation;
     }
 
     public Location(String aName){
@@ -50,7 +52,7 @@ public class Location implements Named, ContainsItems, Comparable<Location>, Ser
         return position;
     }
 
-    public Date getDateOfCreation(){
+    public ZonedDateTime getDateOfCreation(){
         return dateOfCreation;
     }
 
@@ -153,9 +155,9 @@ public class Location implements Named, ContainsItems, Comparable<Location>, Ser
 
     @Override
     public String toString(){
-        SimpleDateFormat formater = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss");
         return "Локация " + getName() + ". Количество предметов в локации: " + itemsList.size() + ". Площадь "
-                + getArea() + ". Позиция: " + getPosition().toString() + ". Дата создания: " + formater.format(getDateOfCreation()) + ".";
+                + getArea() + ". Позиция: " + getPosition().toString() + ". Дата создания: " + formatter.format(getDateOfCreation()) + ".";
     }
 
     @Override

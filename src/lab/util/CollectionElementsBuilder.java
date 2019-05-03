@@ -29,6 +29,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public class CollectionElementsBuilder {
@@ -117,7 +120,24 @@ public class CollectionElementsBuilder {
                         continue;
                     }
                 }
-                Location location = new Location(elementChildren.item(0).getTextContent(), area, rectanglePosition, Long.parseLong(elementChildren.item(3).getTextContent()));
+                NodeList date = elementChildren.item(3).getChildNodes();
+                ZonedDateTime zonedDateTime = null;
+                if (date.getLength() != 2
+                        || !date.item(0).getNodeName().equals("seconds")
+                        || !date.item(1).getNodeName().equals("timeZone")){
+                    defectiveElements++;
+                    continue;
+                }
+                else{
+                    try {
+                        zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(Integer.parseInt(date.item(0).getTextContent())), ZoneId.of(date.item(1).getTextContent()));
+                    }
+                    catch (NumberFormatException ex){
+                        defectiveElements++;
+                        continue;
+                    }
+                }
+                Location location = new Location(elementChildren.item(0).getTextContent(), area, rectanglePosition, zonedDateTime);
 
                 NodeList itemsNodes = elementChildren.item(4).getChildNodes();
                 for (int j = 0; j < itemsNodes.getLength(); j++){
@@ -209,8 +229,13 @@ public class CollectionElementsBuilder {
                 rightTopPointY.setTextContent("" + location.getPosition().getRightTopPoint().getY());
                 rightTopPoint.appendChild(rightTopPointY);
                 Element date = document.createElement("date");
-                date.setTextContent("" + location.getDateOfCreation().getTime());
                 element.appendChild(date);
+                Element seconds = document.createElement("seconds");
+                seconds.setTextContent("" + location.getDateOfCreation().toInstant().getEpochSecond());
+                date.appendChild(seconds);
+                Element timeZone = document.createElement("timeZone");
+                timeZone.setTextContent("" + location.getDateOfCreation().getZone().toString());
+                date.appendChild(timeZone);
                 Element items = document.createElement("items");
                 element.appendChild(items);
                 for (Item itemInLocation : location.getItems()) {
@@ -332,6 +357,7 @@ public class CollectionElementsBuilder {
         }
         catch (Exception ex){
             System.out.println("Элемент задан в неверном формета");
+            ex.printStackTrace();
         }
         return null;
     }
