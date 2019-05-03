@@ -88,7 +88,10 @@ public class ClientID {
     }
 
     public static void clearAll(){
-        ids.clear();
+        for (ClientID clientID : ids.keySet()){
+            if (!clientID.isProcessing)
+                ids.remove(clientID);
+        }
     }
 
     /**
