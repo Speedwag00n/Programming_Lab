@@ -2,10 +2,13 @@ package lab.util;
 
 import lab.locations.Location;
 import lab.server.start.ResponseBuilder;
+import lab.util.commands.Commands;
 
 import java.io.*;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,7 @@ public class CollectionElementsManager {
     private ConcurrentLinkedDeque<Location> collection = new ConcurrentLinkedDeque<>();
     private String mainFile;
     private Date initDate;
+    private Connection databaseConnection;
     
     private static ArrayList<String> itemsDescription = new ArrayList<>();
     static
@@ -39,6 +43,16 @@ public class CollectionElementsManager {
         mainFile = aMainFile;
         initDate = new Date();
         CollectionElementsBuilder.fromFile(mainFile, collection);
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            databaseConnection = DriverManager.getConnection("jdbc:postgresql://localhost/postgres?user=test&password=123");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -180,24 +194,50 @@ public class CollectionElementsManager {
         }
     }
 
-    public boolean register(String loginAndEmail, ResponseBuilder response){
-        //TODO make registration
-        if (Math.random() > 0.5) {
-            response.append("Не удалось зарегистрировать нового пользователя.");
-            return false;
+    public boolean register(String argument, ResponseBuilder response){
+        String[] loginAndEmail = argument.split(" ", 2);
+        if (loginAndEmail.length == 2 && Commands.isLoginValid(loginAndEmail[0].trim()) && Commands.isEmailValid(loginAndEmail[1].trim())){
+            Statement statement;
+            try {
+                statement = databaseConnection.createStatement();
+                ResultSet rs = statement.executeQuery("SELECT UserID FROM Users WHERE Login LIKE '" + loginAndEmail[0].trim() + "'");
+                if (rs.next()){
+                    response.append("Не удалось зарегистрировать нового пользователя. Логин уже занят.");
+                    return false;
+                }
+                rs = statement.executeQuery("SELECT UserID FROM Users WHERE Email LIKE '" + loginAndEmail[1].trim() + "'");
+                if (rs.next()){
+                    response.append("Не удалось зарегистрировать нового пользователя. Данный почтовый адрес уже используется.");
+                    return false;
+                }
+                statement.executeUpdate("INSERT INTO Users (Login, Email, Password) VALUES ('" + loginAndEmail[0].trim() + "', '" + loginAndEmail[1].trim() + "', '110022')");
+                response.append("Новый пользователь зарегистрирован, сгенерированный пароль выслан на указанную почту.");
+                return true;
+            } catch (SQLException e) {
+
+            }
         }
-        response.append("Новый пользователь зарегистрирован, сгенерированный пароль выслан на указанную почту.");
-        return true;
+        response.append("Не удалось зарегистрировать нового пользователя.");
+        return false;
     }
 
-    public boolean login(String loginAndPassword, ResponseBuilder response){
-        //TODO make authentication
-        if (Math.random() > 0.5){
-            response.append("Авторизация не удалась.");
-            return false;
+    public boolean login(String argument, ResponseBuilder response){
+        String[] loginAndPassword = argument.split(" ", 2);
+        if (loginAndPassword.length == 2 && Commands.isLoginValid(loginAndPassword[0].trim()) && Commands.isPasswordValid(loginAndPassword[1].trim())){
+            Statement statement;
+            try {
+                statement = databaseConnection.createStatement();
+                ResultSet rs = statement.executeQuery("SELECT UserID FROM Users WHERE Login LIKE '" + loginAndPassword[0].trim() + "' AND Password LIKE '" + loginAndPassword[1].trim() + "'");
+                if (rs.next()){
+                    response.append("Авторизация прошла успешно.");
+                    return true;
+                }
+            } catch (SQLException e) {
+
+            }
         }
-        response.append("Авторизация прошла успешно.");
-        return true;
+        response.append("Авторизация не удалась. Проверьте правильность введенного логина и пароля.");
+        return false;
     }
 
     /**
