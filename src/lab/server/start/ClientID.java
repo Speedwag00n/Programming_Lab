@@ -2,6 +2,7 @@ package lab.server.start;
 
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
+import java.util.HashSet;
 import java.util.WeakHashMap;
 
 /**
@@ -17,7 +18,9 @@ public class ClientID {
     private int port;
     private int receivedPackets;
     private boolean isProcessing;
+    private boolean isLogged;
     private static WeakHashMap<ClientID, WeakReference<ClientID>> ids = new WeakHashMap<>();
+    private static HashSet<ClientID> authorizedClients = new HashSet<>();
 
     private ClientID(InetAddress aAddress, int aPort){
 
@@ -79,6 +82,15 @@ public class ClientID {
         return isProcessing;
     }
 
+    public void successfulLogged(){
+        authorizedClients.add(this);
+        isLogged = true;
+    }
+
+    public boolean isLogged(){
+        return isLogged;
+    }
+
     public void startProcessing(){
         isProcessing = true;
     }
@@ -89,7 +101,7 @@ public class ClientID {
 
     public static void clearAll(){
         for (ClientID clientID : ids.keySet()){
-            if (!clientID.isProcessing)
+            if (!clientID.isProcessing && !clientID.isLogged)
                 ids.remove(clientID);
         }
     }

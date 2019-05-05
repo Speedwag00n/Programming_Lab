@@ -1,5 +1,6 @@
 package lab.server.start;
 
+import com.sun.security.ntlm.Client;
 import lab.util.CollectionElementsManager;
 import lab.util.CommandsExecutor;
 import lab.util.commands.Commands;
@@ -26,26 +27,29 @@ public class ServerProcessThread implements Runnable {
 
     @Override
     public void run() {
-        int commandCode = packetsParts.get(0).getData()[METADATA_LENGTH] & 0xff;
-        Commands.CommandsList command = Commands.CommandsList.values()[commandCode - 1];
+        int commandCode = packetsParts.get(0).getData()[REQUIRED_CLIENT_METADATA_LENGTH] & 0xff;
+        Commands.CommandsList command = Commands.CommandsList.getCommand(commandCode);
         byte[] argument = unpackArgument(packetsParts);
         ResponseBuilder response = new ResponseBuilder();
-        CommandsExecutor.executeCommand(command, argument, collectionManager, response);
+        ClientID clientID = ClientID.getClientID(packetsParts.get(0).getAddress(), packetsParts.get(0).getPort());
+        InetSocketAddress inetAddress = new InetSocketAddress(clientID.getAddress(), clientID.getPort());
+        Commands.CommandExecutionStatus status = CommandsExecutor.executeCommand(command, argument, collectionManager, clientID, response);
+        if (status == Commands.CommandExecutionStatus.MADE_LOGGED)
+            clientID.successfulLogged();
         try {
             socket = new DatagramSocket();
         } catch (SocketException e) {
 
         }
-        InetSocketAddress inetAddress = new InetSocketAddress(packetsParts.get(0).getAddress(), packetsParts.get(0).getPort());
         byte[] responseBuffer = response.toString().getBytes();
-        int countOfPackets = responseBuffer.length / (PACKET_LENGTH - METADATA_LENGTH) + ((responseBuffer.length % (PACKET_LENGTH - METADATA_LENGTH) == 0 ? 0 : 1));
+        int countOfPackets = (responseBuffer.length + COMMAND_EXECUTION_CODE_LENGTH) / (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH) + (((responseBuffer.length + COMMAND_EXECUTION_CODE_LENGTH) % (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH) == 0 ? 0 : 1));
         byte[] buffer = new byte[PACKET_LENGTH];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, inetAddress);
         byte space = " ".getBytes()[0];
         if (countOfPackets > 256){
             buffer[0] = (byte)1;
             buffer[1] = (byte)0;
-            for (int i = METADATA_LENGTH; i < PACKET_LENGTH; i++){
+            for (int i = REQUIRED_SERVER_METADATA_LENGTH; i < PACKET_LENGTH; i++){
                 buffer[i] = space;
             }
             try {
@@ -54,23 +58,27 @@ public class ServerProcessThread implements Runnable {
             catch (IOException e) {
 
             }
-            ClientID.getClientID(inetAddress.getAddress(), inetAddress.getPort()).finishProcessing();
+            clientID.finishProcessing();
             return;
         }
         for (int i = 0; i < countOfPackets; i++){
             buffer[0] = (byte)countOfPackets;
             buffer[1] = (byte)i;
-            if ((responseBuffer.length - i * (PACKET_LENGTH - METADATA_LENGTH) >= (PACKET_LENGTH - METADATA_LENGTH))){
-                for (int j = 0; j < (PACKET_LENGTH - METADATA_LENGTH); j++){
-                    buffer[j + METADATA_LENGTH] = responseBuffer[i * (PACKET_LENGTH - METADATA_LENGTH) + j];
+            if (i == 0)
+                buffer[2] = (byte)status.getCode();
+            int bytesLeft = (responseBuffer.length + ((i == 0) ? 0 : COMMAND_EXECUTION_CODE_LENGTH)) - i * (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH);
+            int offset = i * (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_EXECUTION_CODE_LENGTH);
+            if (bytesLeft >= (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH)){
+                for (int j = 0; j < (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH - ((i == 0) ? COMMAND_EXECUTION_CODE_LENGTH : 0)); j++){
+                    buffer[j + REQUIRED_SERVER_METADATA_LENGTH + ((i == 0) ? COMMAND_EXECUTION_CODE_LENGTH : 0)] = responseBuffer[offset + j];
                 }
             }
             else {
-                for (int j = 0; j < (responseBuffer.length - i * (PACKET_LENGTH - METADATA_LENGTH)); j++) {
-                    buffer[j + METADATA_LENGTH] = responseBuffer[i * (PACKET_LENGTH - METADATA_LENGTH) + j];
+                for (int j = 0; j < bytesLeft; j++) {
+                    buffer[j + REQUIRED_SERVER_METADATA_LENGTH + ((i == 0) ? COMMAND_EXECUTION_CODE_LENGTH : 0)] = responseBuffer[offset + j];
                 }
-                for (int j = (responseBuffer.length - i * (PACKET_LENGTH - METADATA_LENGTH)); j < (PACKET_LENGTH - METADATA_LENGTH); j++){
-                    buffer[j + METADATA_LENGTH] = space;
+                for (int j = bytesLeft; j < (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH - ((i == 0) ? COMMAND_EXECUTION_CODE_LENGTH : 0)); j++){
+                    buffer[j + REQUIRED_SERVER_METADATA_LENGTH + ((i == 0) ? COMMAND_EXECUTION_CODE_LENGTH : 0)] = space;
                 }
             }
             packet = new DatagramPacket(buffer, buffer.length, inetAddress);
@@ -81,15 +89,15 @@ public class ServerProcessThread implements Runnable {
             }
         }
 
-        ClientID.getClientID(inetAddress.getAddress(), inetAddress.getPort()).finishProcessing();
+        clientID.finishProcessing();
     }
 
     private static byte[] unpackArgument(ArrayList<DatagramPacket> packetsParts){
-        byte[] argument = new byte[(packetsParts.get(0).getData()[0] & 0xff) * (PACKET_LENGTH - METADATA_LENGTH) - COMMAND_CODE_LENGTH];
+        byte[] argument = new byte[(packetsParts.get(0).getData()[0] & 0xff) * (PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH) - COMMAND_CODE_LENGTH];
         for (int i = 0; i < packetsParts.size(); i++){
             byte[] currentPacketData = packetsParts.get(i).getData();
-            for (int j = 0; j < PACKET_LENGTH - METADATA_LENGTH - ((i == 0) ? COMMAND_CODE_LENGTH : 0); j++) {
-                argument[i * (PACKET_LENGTH - METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_CODE_LENGTH) + j] = currentPacketData[j + METADATA_LENGTH + ((i == 0) ? COMMAND_CODE_LENGTH : 0)];
+            for (int j = 0; j < PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH - ((i == 0) ? COMMAND_CODE_LENGTH : 0); j++) {
+                argument[i * (PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_CODE_LENGTH) + j] = currentPacketData[j + REQUIRED_CLIENT_METADATA_LENGTH + ((i == 0) ? COMMAND_CODE_LENGTH : 0)];
             }
         }
         return argument;

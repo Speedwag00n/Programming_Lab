@@ -1,13 +1,11 @@
 package lab.util;
 
-import com.sun.deploy.util.ArrayUtil;
+
 import lab.locations.Location;
+import lab.server.start.ClientID;
 import lab.server.start.ResponseBuilder;
 import lab.util.commands.Commands;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 /**
@@ -19,61 +17,91 @@ import java.util.ArrayList;
 
 public class CommandsExecutor {
 
-    /**
-     * Parses command to separate command name and its arguments.
-     * @param command Entered string that contains command name and arguments
-     * @return Array composed of two parts (first part is command name, second part is arguments in json format).
-     */
-    public static String[] parseCommand(String command) {
-        command = command.trim();
-        String[] commandParts = command.split(" ", 2);
-        return commandParts;
-    }
-
-    public static boolean executeCommand(Commands.CommandsList command, byte[] argument, CollectionElementsManager collectionManager, ResponseBuilder response){
+    public static Commands.CommandExecutionStatus executeCommand(Commands.CommandsList command, byte[] argument, CollectionElementsManager collectionManager, ClientID clientID, ResponseBuilder response){
+        if (command.needBeLogged() && !clientID.isLogged()){
+            response.append("Похоже, что соединение с сервером было разорвано по техническим причинам, необходима повторная авторизация.");
+            response.append("Пожалуйста, оспользуйтесь командой \"login\".");
+            return Commands.CommandExecutionStatus.NO_LONGER_LOGGED;
+        }
         Location location;
+        boolean result;
         switch (command){
             case ADD:
                 location = Commands.unpackLocations(argument).get(0);
-                collectionManager.addElementInCollection(location, response);
+                result = collectionManager.addElementInCollection(location, response);
                 break;
             case HELP:
-                collectionManager.help(Commands.argumentToString(argument), response);
+                result = collectionManager.help(Commands.argumentToString(argument), response);
                 break;
             case REMOVE_GREATER:
                 location = Commands.unpackLocations(argument).get(0);
-                collectionManager.removeGreater(location, response);
+                if (collectionManager.removeGreater(location, response) > 0)
+                    result = true;
+                else
+                    result = false;
                 break;
             case SHOW:
-                collectionManager.show(response);
+                result = collectionManager.show(response);
                 break;
             case INFO:
-                collectionManager.info(response);
+                result = collectionManager.info(response);
                 break;
             case REMOVE_LOWER:
                 location = Commands.unpackLocations(argument).get(0);
-                collectionManager.removeLower(location, response);
+                if (collectionManager.removeLower(location, response) > 0)
+                    result = true;
+                else
+                    result = false;
                 break;
             case REMOVE:
                 location = Commands.unpackLocations(argument).get(0);
-                collectionManager.addElementInCollection(location, response);
+                result = collectionManager.addElementInCollection(location, response);
                 break;
             case ADD_IF_MAX:
                 location = Commands.unpackLocations(argument).get(0);
-                collectionManager.addIfMax(location, response);
+                result = collectionManager.addIfMax(location, response);
                 break;
 /*            case EXIT:
                 collectionManager.exit(response);
                 break;*/
             case IMPORT:
                 ArrayList<Location> locations = Commands.unpackLocations(argument);
-                collectionManager.importObjects(locations, response);
+                if (collectionManager.importObjects(locations, response) > 0)
+                    result = true;
+                else
+                    result = false;
+                break;
+            case REGISTER:
+                if (clientID.isLogged()){
+                    response.append("Вы уже авторизованы, нет необходимости создавать новый аккаунт.");
+                    result = false;
+                    break;
+                }
+                result = collectionManager.register(Commands.argumentToString(argument), response);
+                break;
+            case LOGIN:
+                if (clientID.isLogged()){
+                    response.append("Вы уже авторизованы.");
+                    result = false;
+                    break;
+                }
+                result = collectionManager.login(Commands.argumentToString(argument), response);
+                if (result == true)
+                    return Commands.CommandExecutionStatus.MADE_LOGGED;
                 break;
                 default:
                     response.append("Команда не найдена. Воспользуйтесь командой \"help help\" для получения подробного описания доступных команд.");
-                    return false;
+                    result = false;
+                    break;
         }
-        return true;
+        if (result && !clientID.isLogged())
+            return Commands.CommandExecutionStatus.NOT_LOGGED_SUCCESSFUL;
+        else if (!result && !clientID.isLogged())
+            return Commands.CommandExecutionStatus.NOT_LOGGED_NOT_SUCCESSFUL;
+        else if (result && clientID.isLogged())
+            return Commands.CommandExecutionStatus.LOGGED_SUCCESSFUL;
+        else
+            return Commands.CommandExecutionStatus.LOGGED_NOT_SUCCESSFUL;
     }
 
     /**

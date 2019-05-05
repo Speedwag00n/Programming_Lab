@@ -180,6 +180,26 @@ public class CollectionElementsManager {
         }
     }
 
+    public boolean register(String loginAndEmail, ResponseBuilder response){
+        //TODO make registration
+        if (Math.random() > 0.5) {
+            response.append("Не удалось зарегистрировать нового пользователя.");
+            return false;
+        }
+        response.append("Новый пользователь зарегистрирован, сгенерированный пароль выслан на указанную почту.");
+        return true;
+    }
+
+    public boolean login(String loginAndPassword, ResponseBuilder response){
+        //TODO make authentication
+        if (Math.random() > 0.5){
+            response.append("Авторизация не удалась.");
+            return false;
+        }
+        response.append("Авторизация прошла успешно.");
+        return true;
+    }
+
     /**
      * Takes keyword and show information. In this version there're accessible keyword: <br>
      * - add - shows information about command "add". <br>
@@ -194,7 +214,7 @@ public class CollectionElementsManager {
      * - exit - shows information about command "exit". <br>
      * @param word Keyword that represents section of command "help"
      */
-    public void help(String word, ResponseBuilder response){
+    public boolean help(String word, ResponseBuilder response){
         switch (word.trim()){
             case "add":
                 response.append("Команда \"add {element}\" добавляет новый элемент в коллекцию. Подробнее о формате {element} \n смотрите по команде \"help element\"");
@@ -232,41 +252,56 @@ public class CollectionElementsManager {
                 response.append("Команда \"exit\" сохраняет текущее состояние коллекции в стандартный файл и завершает работу программы.");
                 break;
             case "help":
-                response.append("Команда \"help команда\" выводит информацию о доступых командах (remove, show, add_if_max, remove_greater, remove_lower, info, add, exit)");
+                response.append("Команда \"help команда\" выводит информацию о доступых командах (remove, show, add_if_max, remove_greater, remove_lower, info, add, exit, register, login)");
+                break;
+            case "register":
+                response.append("Команда \"help register\" используется для создания новых аккаунтов. Формат команды: \"register логин почта\".");
+                response.append("Если логин и почта ещё не были использованы для создани других аккаунтов, программа создаст новый аккаунт и пришлёт сгенерированный пароль на указанную почту.");
+                response.append("Обратите внимание, что логин и почта (часть до домена) не должны содержать никаких других символов, кроме латинских букв a-z, A-Z и цифр 0-9.");
+                break;
+            case "login":
+                response.append("Команда \"help login\" используется для входа в систему, который необходим для последующей работы с объектами в базе данных.");
+                response.append("Формат команды: \"login логин пароль\"");
+                response.append("Обратите внимание, что логин и пароль не должны содержать никаких других символов, кроме латинских букв a-z, A-Z и цифр 0-9.");
                 break;
                 default:
                     response.append("Неизвестная команда. Подробнее о доступных командах смотрите по команде \"help help\"");
-                    break;
+                    return false;
         }
+        return true;
     }
 
     /**
      * Shows in standard output stream information about the collection, its date of initialization and its size.
      */
-    public void info(ResponseBuilder response){
+    public boolean info(ResponseBuilder response){
         synchronized (collection) {
             synchronizeCollection();
             SimpleDateFormat formater = new SimpleDateFormat("dd.MM.yyyy, в hh:mm:ss");
             response.append("Программа хранит объекты класса Location, содержащие классы Item, в коллекции типа ConcurrentLinkedDeque");
             response.append("Коллекция была загружена " + formater.format(initDate) + ". Сейчас она содержит " + collection.size() + " элементов.");
+            return true;
         }
     }
 
     /**
      * Shows in standard output stream all elements from the collection like a Strings
      */
-    public void show(ResponseBuilder response) {
+    public boolean show(ResponseBuilder response) {
         synchronized (collection) {
             synchronizeCollection();
-            if (!collection.isEmpty())
+            if (!collection.isEmpty()) {
                 collection.stream().forEach((Location location) -> {
                     response.append(location.toString());
                     response.append("Предметы в локации:");
                     location.getItems().stream().forEach((item) -> response.append(item.toString()));
                 });
-            else
+                return true;
+            }
+            else {
                 response.append("Коллекция пуста.");
-
+                return false;
+            }
         }
     }
 

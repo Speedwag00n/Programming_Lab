@@ -1,12 +1,12 @@
 package lab.start;
 
 import lab.util.CommandsExecutor;
-import lab.util.commands.Commands;
 import lab.util.packet.PacketOverflowException;
+import lab.util.commands.Commands;
 
 import static lab.util.packet.PacketSettings.*;
+import static lab.util.commands.Commands.*;
 
-import java.awt.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -19,6 +19,7 @@ import java.util.Scanner;
 public class Main {
 
     private static boolean working = true;
+    private static boolean logged = false;
     private static final String ADDRESS = "localhost";
     private static int PORT;
     private static InetSocketAddress inetAddress;
@@ -54,18 +55,19 @@ public class Main {
 
         inetAddress = new InetSocketAddress(ADDRESS, PORT);
 
+        System.out.println("Введите логин и пароль для авторизации или создайте новый аккаунт. Более подробную информацию смотрите, используя команды \"help register\" или \"help login\".");
+
         main: while(working) {
 
             String commandLine = null;
 
-            System.out.println("Введите команду");
+            System.out.println("Введите команду.");
 
             try {
                 commandLine = commandsScanner.nextLine();
-
             }
             catch(NoSuchElementException ex) {
-                System.out.println("Завершение работы приложения");
+                System.out.println("Завершение работы приложения.");
                 try {
                     channel.close();
                 }
@@ -75,24 +77,31 @@ public class Main {
                 working = false;
                 continue;
             }
-            String[] commandParts = CommandsExecutor.parseCommand(commandLine);
-            if (commandParts[0].equals("exit")) {
-                System.out.println("Завершение работы приложения");
-                working = false;
-                continue;
-            }
-            Commands.CommandsList command = Commands.getCommand(commandParts[0]);
+            String[] commandParts = parseCommand(commandLine);
+            CommandsList command = getCommand(commandParts[0]);
             if (command == null){
                 System.out.println("Команда не найдена. Воспользуйтесь командой \"help help\" для получения подробного описания доступных команд и их аргументах.");
                 continue;
             }
-            if (!Commands.isCommandValid(command, commandParts.length > 1)){
+            if (command.needBeLogged() && !logged){
+                System.out.println("Для использования данной команды необходимо быть авторизованным.");
+                continue;
+            }
+            if (command == CommandsList.EXIT) {
+                System.out.println("Завершение работы приложения");
+                working = false;
+                continue;
+            }
+            if (!isCommandValid(command, commandParts.length > 1)){
                 System.out.println("У команды отсутствует аргумент. Воспользуйтесь командой \"help help\" для получения подробного описания доступных команд и их аргументах.");
                 continue;
             }
-            byte[] packedCommandArgs = Commands.packArgument(command, ((commandParts.length > 1) ? commandParts[1] : null));
+            byte[] packedCommandArgs = packArgument(command, ((commandParts.length > 1) ? commandParts[1] : ""));
+            if (packedCommandArgs == null){
+                System.out.println("Аргументы были введены в неверном формате или в неверном количестве.");
+            }
             for (int i = 0; i < countOfAttempts; i++) {
-
+                CommandExecutionStatus commandExecutionStatus;
                 try {
                     if(!sendRequest(command, packedCommandArgs))
                         continue main;
@@ -101,18 +110,16 @@ public class Main {
                     System.out.println("Запрос превышает допустимый размер и не может быть отправлен.");
                     continue main;
                 }
-
-                try {
-                    Thread.sleep(900);
-                } catch (InterruptedException e) {
-
-                }
-
-                if (!receiveResponse()) {
+                if ((commandExecutionStatus = receiveResponse()) == null) {
                     continue;
                 }
-                else
+                else {
+                    if (commandExecutionStatus == CommandExecutionStatus.NO_LONGER_LOGGED)
+                        logged = false;
+                    else if (commandExecutionStatus == CommandExecutionStatus.MADE_LOGGED)
+                        logged = true;
                     continue main;
+                }
             }
 
             System.out.println("Похоже, что сервер временно недоступен, попробуйте отправить запрос чуть позже");
@@ -126,7 +133,7 @@ public class Main {
         if (packedCommandArgs == null)
             return false;
         ByteBuffer commandArgs = ByteBuffer.wrap(packedCommandArgs);
-        int countOfPackets = (commandArgs.limit() + COMMAND_CODE_LENGTH) / (PACKET_LENGTH - METADATA_LENGTH) + ((((commandArgs.limit() + COMMAND_CODE_LENGTH) % (PACKET_LENGTH - METADATA_LENGTH)) == 0) ? 0 : 1);
+        int countOfPackets = (commandArgs.limit() + COMMAND_CODE_LENGTH) / (PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH) + ((((commandArgs.limit() + COMMAND_CODE_LENGTH) % (PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH)) == 0) ? 0 : 1);
         if (countOfPackets > 256){
             throw new PacketOverflowException("Can't send request because there're too many packets for this request");
         }
@@ -135,13 +142,14 @@ public class Main {
             buffer.clear();
             buffer.put((byte)countOfPackets);
             buffer.put((byte)i);
+            int offset = i*(PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_CODE_LENGTH);
             if (i == 0)
                 buffer.put((byte)command.getNumber());
-            if (((commandArgs.limit() - (i*(PACKET_LENGTH - METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_CODE_LENGTH))) >= (PACKET_LENGTH - METADATA_LENGTH - ((i == 0) ? COMMAND_CODE_LENGTH : 0))))
-                buffer.put(commandArgs.array(), i*(PACKET_LENGTH - METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_CODE_LENGTH), PACKET_LENGTH - METADATA_LENGTH - ((i == 0) ? COMMAND_CODE_LENGTH : 0));
+            if (((commandArgs.limit() - offset) >= (PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH - ((i == 0) ? COMMAND_CODE_LENGTH : 0))))
+                buffer.put(commandArgs.array(), offset, PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH - ((i == 0) ? COMMAND_CODE_LENGTH : 0));
             else {
-                buffer.put(commandArgs.array(), i*(PACKET_LENGTH - METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_CODE_LENGTH), (commandArgs.limit() - (i*(PACKET_LENGTH - METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_CODE_LENGTH))));
-                byte[] spaces = new byte[(PACKET_LENGTH - METADATA_LENGTH - ((i == 0) ? COMMAND_CODE_LENGTH : 0)) - (commandArgs.limit() - (i*(PACKET_LENGTH - METADATA_LENGTH) - ((i == 0) ? 0 : COMMAND_CODE_LENGTH)))];
+                buffer.put(commandArgs.array(), offset, (commandArgs.limit() - offset));
+                byte[] spaces = new byte[(PACKET_LENGTH - REQUIRED_CLIENT_METADATA_LENGTH - ((i == 0) ? COMMAND_CODE_LENGTH : 0)) - (commandArgs.limit() - offset)];
                 Arrays.fill(spaces, " ".getBytes()[0]);
                 buffer.put(spaces);
             }
@@ -155,7 +163,7 @@ public class Main {
         return true;
     }
 
-    private static boolean receiveResponse(){
+    private static CommandExecutionStatus receiveResponse(){
         ArrayList<ByteBuffer> packetsParts = new ArrayList<>();
         int countOfPackets = -1;
         int receivedPackets = 0;
@@ -187,16 +195,17 @@ public class Main {
             }
         }
         if (countOfPackets == receivedPackets){
-            response = ByteBuffer.allocate(countOfPackets * (PACKET_LENGTH - METADATA_LENGTH));
-            for (ByteBuffer buf : packetsParts){
+            response = ByteBuffer.allocate(countOfPackets * (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH) - COMMAND_CODE_LENGTH);
+            for (int i = 0; i < packetsParts.size(); i++){
+                ByteBuffer buf = packetsParts.get(i);
                 buf.flip();
-                response.put(buf.array(), METADATA_LENGTH, (PACKET_LENGTH - METADATA_LENGTH));
+                response.put(buf.array(), REQUIRED_SERVER_METADATA_LENGTH + ((i == 0) ? COMMAND_EXECUTION_CODE_LENGTH : 0), (PACKET_LENGTH - REQUIRED_SERVER_METADATA_LENGTH - ((i == 0) ? COMMAND_EXECUTION_CODE_LENGTH : 0)));
             }
             System.out.println(new String(response.array()).trim());
-            return true;
+            return CommandExecutionStatus.getStatus(packetsParts.get(0).get(2) & 0xff);
         }
         else
-            return false;
+            return null;
     }
 
 }
