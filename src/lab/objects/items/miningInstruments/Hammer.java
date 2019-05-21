@@ -4,19 +4,31 @@ import lab.objects.items.Item;
 
 import java.io.Serializable;
 
+/**
+ * Hammer item class.
+ * * @author Nemankov Ilia
+ * * @version 1.0.0
+ * * @since 1.4.0
+ */
 public class Hammer extends MiningInstrument implements Serializable {
 
     private Head head;
     private Handle handle;
 
-    public Hammer(String name, Material headMaterial, Material handleMaterial){
+    /**
+     * Constructor of Hammer class.
+     *
+     * @param name           name of hammer.
+     * @param headMaterial   material of head of hammer.
+     * @param handleMaterial material of handle of hammer.
+     */
+    public Hammer(String name, Material headMaterial, Material handleMaterial) {
         setName(name);
         head = new Head(headMaterial);
         handle = new Handle(handleMaterial);
         try {
-            setPowerCoefficient(head.coefficient*0.8F + handle.coefficient*0.2F);
-        }
-        catch (IncorrectPowerCoefficientException e){
+            setPowerCoefficient(head.coefficient * 0.8F + handle.coefficient * 0.2F);
+        } catch (IncorrectPowerCoefficientException e) {
             System.out.println("Возникло исключение " + e);
         }
     }
@@ -24,10 +36,11 @@ public class Hammer extends MiningInstrument implements Serializable {
     private class Head extends Item implements Serializable {
         private float coefficient;
         private Material material;
-        public Head(Material aMaterial){
+
+        public Head(Material aMaterial) {
             super("Боёк");
             material = aMaterial;
-            switch (aMaterial){
+            switch (aMaterial) {
                 case STEEL:
                     coefficient = 0.95F;
                     break;
@@ -43,22 +56,23 @@ public class Hammer extends MiningInstrument implements Serializable {
                 case PLASTIC:
                     coefficient = 0.05F;
                     break;
-                    default:
-                        coefficient = 0F;
-                        break;
+                default:
+                    coefficient = 0F;
+                    break;
             }
         }
-        public float getCoefficient(){
+
+        public float getCoefficient() {
             return coefficient;
         }
 
-        public Material getMaterial(){
+        public Material getMaterial() {
             return material;
         }
 
         @Override
-        public boolean equals(Object obj){
-            if(!super.equals(obj))
+        public boolean equals(Object obj) {
+            if (!super.equals(obj))
                 return false;
             Head object = (Head) obj;
             if (!(Math.abs(coefficient - object.coefficient) < 0.000000001))
@@ -67,15 +81,15 @@ public class Hammer extends MiningInstrument implements Serializable {
         }
 
         @Override
-        public String toString(){
+        public String toString() {
             return getName() + ". Коэффициент бойка молотка: " + getCoefficient() + ".";
         }
 
         @Override
-        public int hashCode(){
+        public int hashCode() {
             final int prime = 17;
             int result = super.hashCode();
-            result = result*prime + (int)coefficient*1000000;
+            result = result * prime + (int) coefficient * 1000000;
             return result;
         }
     }
@@ -83,9 +97,10 @@ public class Hammer extends MiningInstrument implements Serializable {
     private class Handle extends Item implements Serializable {
         private float coefficient;
         private Material material;
-        public Handle(Material aMaterial){
+
+        public Handle(Material aMaterial) {
             material = aMaterial;
-            switch (aMaterial){
+            switch (aMaterial) {
                 case PLASTIC:
                     coefficient = 0.95F;
                     break;
@@ -101,22 +116,23 @@ public class Hammer extends MiningInstrument implements Serializable {
                 case STONE:
                     coefficient = 0.05F;
                     break;
-                    default:
-                        coefficient = 0F;
-                        break;
+                default:
+                    coefficient = 0F;
+                    break;
             }
         }
-        public float getCoefficient(){
+
+        public float getCoefficient() {
             return coefficient;
         }
 
-        public Material getMaterial(){
+        public Material getMaterial() {
             return material;
         }
 
         @Override
-        public boolean equals(Object obj){
-            if(!super.equals(obj))
+        public boolean equals(Object obj) {
+            if (!super.equals(obj))
                 return false;
             Handle object = (Handle) obj;
             if (!(Math.abs(coefficient - object.coefficient) < 0.000000001))
@@ -125,52 +141,70 @@ public class Hammer extends MiningInstrument implements Serializable {
         }
 
         @Override
-        public String toString(){
+        public String toString() {
             return getName() + ". Коэффициент рукоятки молотка: " + getCoefficient() + ".";
         }
 
         @Override
-        public int hashCode(){
+        public int hashCode() {
             final int prime = 17;
             int result = super.hashCode();
-            result = result*prime + (int)coefficient*1000000;
+            result = result * prime + (int) coefficient * 1000000;
             return result;
         }
     }
 
-    public void changeHead(Material headMaterial){
+    /**
+     * Method to change head of hammer.
+     *
+     * @param headMaterial material of new head of hammer.
+     */
+    public void changeHead(Material headMaterial) {
         head = new Head(headMaterial);
         try {
-            setPowerCoefficient(head.coefficient*0.8F + handle.coefficient*0.2F);
-        }
-        catch (IncorrectPowerCoefficientException e){
+            setPowerCoefficient(head.coefficient * 0.8F + handle.coefficient * 0.2F);
+        } catch (IncorrectPowerCoefficientException e) {
             System.out.println("Возникло исключение " + e);
         }
         System.out.println("Боёк молотка заменён. Новый коэффициент молотка: " + getPowerCoefficient() + ".");
     }
 
-    public void changeHandle(Material handleMaterial){
+    /**
+     * Method to change handle of hammer.
+     *
+     * @param handleMaterial material of new head of hammer
+     */
+    public void changeHandle(Material handleMaterial) {
         handle = new Handle(handleMaterial);
         try {
-            setPowerCoefficient(head.coefficient*0.8F + handle.coefficient*0.2F);
-        }
-        catch (IncorrectPowerCoefficientException e){
+            setPowerCoefficient(head.coefficient * 0.8F + handle.coefficient * 0.2F);
+        } catch (IncorrectPowerCoefficientException e) {
             System.out.println("Возникло исключение " + e);
         }
         System.out.println("Рукоять молотка заменена. Новый коэффициент молотка: " + getPowerCoefficient() + ".");
     }
 
-    public String getHeadMaterialName(){
+    /**
+     * Method that returns name of hammer head material.
+     *
+     * @return name of hammer head material.
+     */
+    public String getHeadMaterialName() {
         return head.getMaterial().fromMaterialToString();
     }
 
-    public String getHandleMaterialName(){
+    /**
+     * Method that returns name of hammer handle material.
+     *
+     * @return name of hammer handle material.
+     */
+    public String getHandleMaterialName() {
         return handle.getMaterial().fromMaterialToString();
     }
 
     @Override
-    public boolean equals(Object obj){
-        if(!super.equals(obj))
+    public boolean equals(Object obj) {
+        if (!super.equals(obj))
             return false;
         Hammer object = (Hammer) obj;
         if (!head.equals(object.head))
@@ -181,16 +215,16 @@ public class Hammer extends MiningInstrument implements Serializable {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return getName() + ". Коэффициент молотка: " + getPowerCoefficient() + ".";
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         final int prime = 17;
         int result = super.hashCode();
-        result = result*prime + ((head == null) ? 0 : head.hashCode());
-        result = result*prime + ((handle == null) ? 0 : handle.hashCode());
+        result = result * prime + ((head == null) ? 0 : head.hashCode());
+        result = result * prime + ((handle == null) ? 0 : handle.hashCode());
         return result;
     }
 

@@ -1,27 +1,29 @@
 package lab.server.start;
 
+import lab.locations.Location;
+import lab.server.processing.ClientID;
+import lab.server.processing.ServerProcessThread;
 import lab.util.CollectionElementsManager;
-import static lab.util.packet.PacketSettings.*;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+
+import static lab.util.packet.PacketSettings.PACKET_LENGTH;
 
 /**
  * Main class of server side of application that controls processing of users data.
+ *
  * @author Nemankov Ilia
  * @version 1.0.0
  * @since 1.6.0
  */
-
 public class RunServer {
 
     private static boolean working = true;
     private static DatagramSocket socket;
     private static int PORT;
-    private static final String filePath = System.getenv("LAB_FIVE");
 
     private static HashMap<ClientID, ArrayList<DatagramPacket>> packetsParts = new HashMap<>();
     private static CollectionElementsManager collectionManager;
@@ -32,13 +34,11 @@ public class RunServer {
             int port;
             if ((args.length > 0) && ((port = Integer.parseInt(args[0])) >= 0) && (port < 65536)) {
                 PORT = port;
-            }
-            else {
+            } else {
                 System.out.println("Введите корректный порт.");
                 System.exit(0);
             }
-        }
-        catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             System.out.println("Введите корректный порт.");
             System.exit(0);
         }
@@ -48,14 +48,16 @@ public class RunServer {
             socket = new DatagramSocket(null);
             socket.bind(address);
             socket.setSoTimeout(1000);
-        }
-        catch (SocketException e) {
+        } catch (SocketException e) {
             System.out.println("Порт занят, сервер не может быть запущен");
             return;
         }
-
-        collectionManager = new CollectionElementsManager(filePath);
-
+        try {
+            collectionManager = new CollectionElementsManager();
+        } catch (Throwable e) {
+            System.out.println("Не удалось установить соединение с базой данных.");
+            System.exit(0);
+        }
         while (working) {
 
             byte[] buffer = new byte[PACKET_LENGTH];
@@ -64,19 +66,17 @@ public class RunServer {
 
             try {
                 socket.receive(packet);
-            }
-            catch (SocketTimeoutException e){
+            } catch (SocketTimeoutException e) {
                 packetsParts.clear();
                 ClientID.clearAll();
                 continue;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
 
             }
 
             ClientID clientID = ClientID.getClientID(packet.getAddress(), packet.getPort());
 
-            if (!packetsParts.containsKey(clientID)){
+            if (!packetsParts.containsKey(clientID)) {
                 packetsParts.put(clientID, new ArrayList<>());
                 clientID.clearOutsideStatement();
             }
@@ -90,7 +90,7 @@ public class RunServer {
             while (packetsParts.get(clientID).size() < currentPacketNumber) {
                 packetsParts.get(clientID).add(null);
             }
-            if ((packetsParts.get(clientID).size() == currentPacketNumber)){
+            if ((packetsParts.get(clientID).size() == currentPacketNumber)) {
                 packetsParts.get(clientID).add(packet);
                 clientID.incReceivedPackets();
             }
@@ -110,7 +110,7 @@ public class RunServer {
 
     }
 
-    private static void compileRequest(ClientID clientID){
+    private static void compileRequest(ClientID clientID) {
         ServerProcessThread processRequest = new ServerProcessThread(packetsParts.remove(clientID), collectionManager);
         Thread processRequestThread = new Thread(processRequest);
         clientID.startProcessing();
