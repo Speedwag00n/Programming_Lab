@@ -33,7 +33,8 @@ public class Show extends DBCommand {
             if (!collection.isEmpty()) {
                 collection.stream().forEach((Location location) -> {
                     logger.append(location.toString() + " Владелец: " + location.getOwner() + ".");
-                    logger.append("Предметы в локации:");
+                    if (location.getItems().size() != 0)
+                        logger.append("Предметы в локации:");
                     location.getItems().stream().forEach((item) -> logger.append(item.toString()));
                 });
             } else {
