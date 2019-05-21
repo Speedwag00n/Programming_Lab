@@ -27,6 +27,7 @@ public class MessageSender {
         properties.put("mail.smtp.port", "587");
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.connectiontimeout", "1000");
         properties.put("mail.smtp.user", "user");
         properties.put("mail.smtp.password", "password");
     }

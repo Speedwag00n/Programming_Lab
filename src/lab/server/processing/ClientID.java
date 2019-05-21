@@ -2,6 +2,8 @@ package lab.server.processing;
 
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
+import java.util.Collections;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -18,7 +20,7 @@ public class ClientID {
     private int port;
     private int receivedPackets;
     private boolean isProcessing;
-    private static WeakHashMap<ClientID, WeakReference<ClientID>> ids = new WeakHashMap<>();
+    private static Map<ClientID, WeakReference<ClientID>> ids = Collections.synchronizedMap(new WeakHashMap<>());
 
     private ClientID(InetAddress aAddress, int aPort) {
 

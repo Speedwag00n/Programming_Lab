@@ -32,7 +32,7 @@ public class Main {
     private static InetSocketAddress inetAddress;
     private static DatagramChannel channel = null;
     private static int countOfAttempts = 5;
-    private static int receivingTime = 500;
+    private static int receivingTime = 3000;
 
     public static void main(String[] args) {
 
@@ -179,6 +179,9 @@ public class Main {
                 }
                 if (packetsParts.get(currentPacketNumber) == null) {
                     packetsParts.set(currentPacketNumber, buffer);
+                }
+                if (countOfPackets == receivedPackets){
+                    break;
                 }
             } catch (IOException e) {
 

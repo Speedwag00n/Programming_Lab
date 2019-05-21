@@ -47,7 +47,7 @@ public class RunServer {
         try {
             socket = new DatagramSocket(null);
             socket.bind(address);
-            socket.setSoTimeout(1000);
+            socket.setSoTimeout(10000);
         } catch (SocketException e) {
             System.out.println("Порт занят, сервер не может быть запущен");
             return;
