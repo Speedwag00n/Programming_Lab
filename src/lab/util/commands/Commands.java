@@ -110,18 +110,7 @@ public class Commands {
                     return new RemoveGreater(arguments[0], arguments[1], Commands.packLocation(arguments[2]));
                 case 3:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    try {
-                        if (arguments.length == 2) {
-                            return new Show(arguments[0], arguments[1], new byte[0]);
-                        }
-                        int list = Integer.parseInt(arguments[2]);
-                        if (list < 1) {
-                            throw new InvalidArgumentsException("Неверный номер страницы");
-                        }
-                    } catch (NumberFormatException nfe) {
-                        throw new InvalidArgumentsException("Аргумент не является числом");
-                    }
-                    return new Show(arguments[0], arguments[1], arguments[2].trim().getBytes());
+                    return new Show(arguments[0], arguments[1], new byte[0]);
                 case 4:
                     checkLoginAndPw(arguments[0], arguments[1]);
                     return new Info(arguments[0], arguments[1]);
@@ -178,7 +167,7 @@ public class Commands {
             case 2:
                 return new RemoveGreater(login, password, argument);
             case 3:
-                return new Show(login, password, argument);
+                return new Show(login, password, new byte[0]);
             case 4:
                 return new Info(login, password);
             case 5:
