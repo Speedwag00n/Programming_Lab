@@ -60,28 +60,40 @@ public class Main {
 
         inetAddress = new InetSocketAddress(ADDRESS, PORT);
 
+        StringBuilder commandBuffer = new StringBuilder();
+
         main:
         while (working) {
 
             String commandLine;
 
-            System.out.println("Введите команду.");
+            if (!commandBuffer.toString().contains(";"))
+                System.out.println("Введите команду.");
 
-            try {
-                commandLine = commandsScanner.nextLine();
-            } catch (NoSuchElementException ex) {
-                System.out.println("Завершение работы приложения.");
+            while(!commandBuffer.toString().contains(";")) {
                 try {
-                    channel.close();
-                } catch (IOException e) {
+                    commandLine = commandsScanner.nextLine();
+                } catch (NoSuchElementException ex) {
+                    System.out.println("Завершение работы приложения.");
+                    try {
+                        channel.close();
+                    } catch (IOException e) {
 
+                    }
+                    working = false;
+                    continue;
                 }
-                working = false;
-                continue;
+                if (commandLine.trim().length() != 0)
+                    commandBuffer.append(commandLine.replace("\n", ""));
             }
+
+            String[] commands = commandBuffer.toString().split(";", 2);
+            String commandString = commands[0];
+            commandBuffer.setLength(0);
+            commandBuffer.append(commands[1]);
             Command command;
             try {
-                command = Commands.getCommand(commandLine);
+                command = Commands.getCommand(commandString);
             } catch (InvalidArgumentsException e) {
                 System.out.println(e.getMessage());
                 continue;
