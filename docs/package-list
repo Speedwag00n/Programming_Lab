@@ -1,3 +1,10 @@
+lab.client
+lab.client.mvc.controller
+lab.client.mvc.graphic
+lab.client.mvc.model
+lab.client.mvc.view
+lab.client.settings
+lab.client.start
 lab.interfaces
 lab.locations
 lab.locations.position
@@ -8,12 +15,13 @@ lab.objects.items
 lab.objects.items.miningInstruments
 lab.objects.items.rock
 lab.server.database
+lab.server.database.changes
 lab.server.mail
 lab.server.processing
 lab.server.response
 lab.server.start
 lab.skills
-lab.client.start
 lab.util
 lab.util.commands
 lab.util.packet
+resources.lang
