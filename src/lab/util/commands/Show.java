@@ -14,19 +14,12 @@ import java.util.Deque;
  */
 public class Show extends DBCommand {
 
-    public Show(String login, String password, byte[] argument) {
-        super(login, password, argument);
-    }
-
-    public Show(byte[] login, byte[] password, byte[] argument) {
-        super(login, password, argument);
+    public Show(byte[] argument) {
+        super(argument);
     }
 
     @Override
     public Commands.CommandExecutionStatus execute() {
-        if (!authorization()) {
-            return Commands.CommandExecutionStatus.NOT_LOGGED_NOT_SUCCESSFUL;
-        }
         Logger logger = getLogger();
         Deque<Location> collection = getElementsManager().getCollection();
         synchronized (collection) {
@@ -47,6 +40,11 @@ public class Show extends DBCommand {
     @Override
     public int getCode() {
         return Commands.getCommandCode("show");
+    }
+
+    @Override
+    public boolean needBeAuthorized(){
+        return true;
     }
 
 }

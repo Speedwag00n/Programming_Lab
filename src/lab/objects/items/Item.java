@@ -1,20 +1,23 @@
 package lab.objects.items;
 
+import javafx.scene.image.Image;
 import lab.interfaces.Named;
 import lab.locations.Location;
 
-import java.io.Serializable;
+import java.io.*;
+import java.nio.file.Files;
 
 /**
  * Item class.
  * * @author Nemankov Ilia
- * * @version 1.0.0
+ * * @version 1.1.0
  * * @since 1.3.0
  */
 public abstract class Item implements Named, Serializable {
 
     private String name = "Безымянный";
     private Location location;
+    private byte[] icon;
 
     /**
      * Empty constructor.
@@ -80,6 +83,53 @@ public abstract class Item implements Named, Serializable {
         location = aLocation;
     }
 
+    /**
+     * This method allows to get attributes description of appropriate item.
+     *
+     * @return attributes description.
+     */
+    public String getAttributesDescription() {
+        return "";
+    }
+
+    /**
+     * Getter for packed item icon.
+     *
+     * @return packed item icon.
+     */
+    public byte[] getPackedIcon() {
+        return icon;
+    }
+
+    /**
+     * Setter for packed item icon.
+     *
+     * @return packed item icon.
+     */
+    public void setPackedIcon(byte[] icon) {
+        this.icon = icon;
+    }
+
+    /**
+     * Getter for item icon.
+     *
+     * @return item icon.
+     */
+    public Image getIcon() {
+        if (icon != null && icon.length != 0) {
+            try (ByteArrayInputStream byteStream = new ByteArrayInputStream(icon)) {
+                Image image = new Image(byteStream);
+                return image;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            return new Image("/resources/img/items/" + getClass().getSimpleName().toLowerCase() + ".png");
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -93,6 +143,8 @@ public abstract class Item implements Named, Serializable {
             return false;
         return true;
     }
+
+
 
     @Override
     public int hashCode() {

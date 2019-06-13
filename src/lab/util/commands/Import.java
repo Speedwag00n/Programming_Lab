@@ -16,19 +16,12 @@ import java.util.List;
  */
 public class Import extends DBCommand {
 
-    public Import(String login, String password, byte[] argument) {
-        super(login, password, argument);
-    }
-
-    public Import(byte[] login, byte[] password, byte[] argument) {
-        super(login, password, argument);
+    public Import(byte[] argument) {
+        super(argument);
     }
 
     @Override
     public Commands.CommandExecutionStatus execute() {
-        if (!authorization()) {
-            return Commands.CommandExecutionStatus.NOT_LOGGED_NOT_SUCCESSFUL;
-        }
         Logger logger = getLogger();
         List<Location> locations = Commands.unpackLocations(getPackedArgument());
         if (locations.size() == 0) {
@@ -52,6 +45,11 @@ public class Import extends DBCommand {
     @Override
     public int getCode() {
         return Commands.getCommandCode("import");
+    }
+
+    @Override
+    public boolean needBeAuthorized(){
+        return true;
     }
 
 }

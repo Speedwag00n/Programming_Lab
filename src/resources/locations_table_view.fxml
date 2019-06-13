@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import lab.client.mvc.graphic.ComboBoxElement?>
+<VBox id="body-pane" fx:id="body_pane" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="lab.client.mvc.controller.LocationsTableController"
+      stylesheets="@css/style.css">
+    <children>
+        <Label id="locations-list-table-title" fx:id="locations_list_table_title" styleClass="title-18-no-border-radius" alignment="CENTER" text="%locations_list_table_title" minWidth="1220"
+               maxWidth="Infinity">
+            <VBox.margin>
+                <Insets left="30" right="30" top="20"/>
+            </VBox.margin>
+        </Label>
+        <HBox id="locations-filter-pane" fx:id="locations_filter_pane" minWidth="1220" maxWidth="Infinity">
+            <VBox.margin>
+                <Insets left="30" right="30"/>
+            </VBox.margin>
+            <children>
+                <ComboBox id="locations-filter-pane-field-list" fx:id="locations_filter_pane_field_list" styleClass="menu-list" minWidth="${locations_filter_pane.width * 0.125}" maxWidth="Infinity" onAction="#onTableFilterSelected">
+                    <HBox.margin>
+                        <Insets left="20" top="20" bottom="20"/>
+                    </HBox.margin>
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <ComboBoxElement text="%location_filer_pane_field_list_name" value="0"/>
+                            <ComboBoxElement text="%location_filer_pane_field_list_area" value="1"/>
+                            <ComboBoxElement text="%location_filer_pane_field_list_position" value="2"/>
+                            <ComboBoxElement text="%location_filer_pane_field_list_items" value="3"/>
+                            <ComboBoxElement text="%location_filer_pane_field_list_creation_date" value="4"/>
+                            <ComboBoxElement text="%location_filer_pane_field_list_owner" value="5"/>
+                        </FXCollections>
+                    </items>
+                    <value>
+                        <Label text="%location_filer_pane_field_list_label"/>
+                    </value>
+                </ComboBox>
+                <TextField id="locations-filter-pane-field" fx:id="locations_filter_pane_field" styleClass="input-field-18" HBox.hgrow="ALWAYS">
+                    <HBox.margin>
+                        <Insets left="20" right="20" top="20" bottom="20"/>
+                    </HBox.margin>
+                </TextField>
+            </children>
+        </HBox>
+        <AnchorPane VBox.vgrow="ALWAYS">
+            <VBox.margin>
+                <Insets left="30" right="30" bottom="20"/>
+            </VBox.margin>
+            <TableView styleClass="locations-table-view" fx:id="locations_table_view" minWidth="1220" maxWidth="Infinity" AnchorPane.topAnchor="0" AnchorPane.rightAnchor="0"
+                       AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0">
+                <columns>
+                    <TableColumn minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}" styleClass="locations-table-header-column">
+                        <graphic>
+                            <Label id="locations-list-table-header-name" fx:id="locations_list_table_header_name" styleClass="header-label-18" alignment="CENTER"
+                                   text="%locations_list_table_header_name" minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory property="name" />
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}" styleClass="locations-table-header-column">
+                        <graphic>
+                            <Label id="locations-list-table-header-area" fx:id="locations_list_table_header_area" styleClass="header-label-18" alignment="CENTER"
+                                   text="%locations_list_table_header_area" minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory property="area"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}" styleClass="locations-table-header-column" sortable="false">
+                        <graphic>
+                            <Label id="locations-list-table-header-position" fx:id="locations_list_table_header_position" styleClass="header-label-18" alignment="CENTER"
+                                   text="%locations_list_table_header_position" minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory property="position"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}" styleClass="locations-table-header-column">
+                        <graphic>
+                            <Label id="locations-list-table-header-date" fx:id="locations_list_table_header_date" styleClass="header-label-18" alignment="CENTER"
+                                   text="%locations_list_table_header_date" minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory property="dateOfCreation"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}" styleClass="locations-table-header-column">
+                        <graphic>
+                            <Label id="locations-list-table-header-items" fx:id="locations_list_table_header_items" styleClass="header-label-18" alignment="CENTER"
+                                   text="%locations_list_table_header_items" minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}" styleClass="locations-table-header-column">
+                        <graphic>
+                            <Label id="locations-list-table-header-owner" fx:id="locations_list_table_header_owner" styleClass="header-label-18" alignment="CENTER"
+                                   text="%locations_list_table_header_owner" minWidth="200" prefWidth="${(locations_table_view.width - 20) / 6}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory property="owner"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                </columns>
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+
+                    </FXCollections>
+                </items>
+            </TableView>
+        </AnchorPane>
+    </children>
+</VBox>

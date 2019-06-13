@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import lab.client.mvc.graphic.ComboBoxElement?>
+<VBox id="body-pane" fx:id="body_pane" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      stylesheets="@css/style.css">
+    <children>
+        <Label id="items-list-table-title" fx:id="items_list_table_title" styleClass="title-18-no-border-radius" alignment="CENTER" text="%items_list_table_title"  minWidth="1220"
+               maxWidth="Infinity">
+            <VBox.margin>
+                <Insets left="30" right="30" top="20"/>
+            </VBox.margin>
+        </Label>
+        <HBox id="items-filter-pane" fx:id="items_filter_pane" styleClass="items-table-view"  minWidth="1220" maxWidth="Infinity">
+            <VBox.margin>
+                <Insets left="30" right="30"/>
+            </VBox.margin>
+            <children>
+                <ComboBox id="items-filter-pane-field-list" fx:id="items_filter_pane_field_list" styleClass="menu-list" minWidth="${items_filter_pane.width * 0.125}" maxWidth="Infinity"  onAction="#onTableFilterSelected">
+                    <HBox.margin>
+                        <Insets left="20" top="20" bottom="20"/>
+                    </HBox.margin>
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <ComboBoxElement text="%items_filter_pane_field_list_type" value="0"/>
+                            <ComboBoxElement text="%items_filter_pane_field_list_name" value="1"/>
+                        </FXCollections>
+                    </items>
+                    <value>
+                        <Label text="%items_filter_pane_field_list_title"/>
+                    </value>
+                </ComboBox>
+                <TextField id="items-filter-pane-field" fx:id="items_filter_pane_field" styleClass="input-field-18" HBox.hgrow="ALWAYS">
+                    <HBox.margin>
+                        <Insets left="20" right="20" top="20" bottom="20"/>
+                    </HBox.margin>
+                </TextField>
+            </children>
+        </HBox>
+        <AnchorPane VBox.vgrow="ALWAYS">
+            <VBox.margin>
+                <Insets left="30" right="30" bottom="20"/>
+            </VBox.margin>
+            <TableView styleClass="locations-table-view" fx:id="locations_table_view" minWidth="1220" maxWidth="Infinity" AnchorPane.topAnchor="0" AnchorPane.rightAnchor="0"
+                       AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0">
+                <columns>
+                    <TableColumn minWidth="60" prefWidth="60" fx:id="items_list_table_header_icon" styleClass="locations-table-header-column-without-padding" resizable="false" sortable="false"/>
+                    <TableColumn minWidth="240" prefWidth="${(locations_table_view.width - items_list_table_header_icon.width - 20) / 5}" styleClass="locations-table-header-column">
+                        <graphic>
+                            <Label id="items-list-table-header-type" fx:id="items_list_table_header_type" styleClass="header-label-18" alignment="CENTER"
+                                   text="%items_list_table_header_type" minWidth="240" prefWidth="${(locations_table_view.width - items_list_table_header_icon.width - 20) / 5}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn minWidth="240" prefWidth="${(locations_table_view.width - items_list_table_header_icon.width - 20) / 5}" styleClass="locations-table-header-column" >
+                        <graphic>
+                            <Label id="items-list-table-header-name" fx:id="items_list_table_header_name" styleClass="header-label-18" alignment="CENTER"
+                                   text="%items_list_table_header_name" minWidth="240" prefWidth="${(locations_table_view.width - items_list_table_header_icon.width - 20) / 5}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory property="name"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn minWidth="720" prefWidth="${(locations_table_view.width - items_list_table_header_icon.width - 20) / 5 * 3}" styleClass="locations-table-header-column" sortable="false">
+                        <graphic>
+                            <Label id="items-list-table-header-params" fx:id="items_list_table_header_params" styleClass="header-label-18" alignment="CENTER"
+                                   text="%items_list_table_header_params" minWidth="720" prefWidth="${(locations_table_view.width - items_list_table_header_icon.width - 20) / 5 * 3}"/>
+                        </graphic>
+                        <cellValueFactory>
+                            <PropertyValueFactory/>
+                        </cellValueFactory>
+                    </TableColumn>
+                </columns>
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+
+                    </FXCollections>
+                </items>
+            </TableView>
+        </AnchorPane>
+    </children>
+</VBox>

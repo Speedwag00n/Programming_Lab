@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.stage.Screen?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="lab.client.mvc.controller.MainController"
+      stylesheets="@css/style.css"
+      prefWidth="${screen.visualBounds.width}"
+      prefHeight="${screen.visualBounds.height}"
+      id="root"
+      fx:id="root">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+</VBox>

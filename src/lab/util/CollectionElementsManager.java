@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * This class allows to manage collection.
  *
  * @author Nemankov Ilia
- * @version 1.2.0
+ * @version 1.3.0
  * @since 1.5.0
  */
 public class CollectionElementsManager {
@@ -70,7 +70,7 @@ public class CollectionElementsManager {
             statement = connection.createStatement();
             statement.executeUpdate("create table rock(item_Id serial primary key unique, loc_id integer not null, item_name varchar not null, " +
                     "weight_Of_Ore real not null, weight_Of_Stone real not null, " +
-                    "count_of_pieces integer not null, foreign key (loc_id) references location(loc_id) on delete cascade)");
+                    "count_of_pieces integer not null, icon bytea, foreign key (loc_id) references location(loc_id) on delete cascade)");
             statement.close();
             System.out.println("Таблица предметов Rock не была обнаружена. Для продолжения работы была создана пустая таблица.");
         } catch (SQLException e) {
@@ -80,7 +80,7 @@ public class CollectionElementsManager {
         try {
             statement = connection.createStatement();
             statement.executeUpdate("create table piece(item_Id serial primary key unique, loc_id integer not null, item_name varchar not null, " +
-                    "weight real not null, foreign key (loc_id) references location(loc_id) on delete cascade)");
+                    "weight real not null, icon bytea, foreign key (loc_id) references location(loc_id) on delete cascade)");
             statement.close();
             System.out.println("Таблица предметов Piece не была обнаружена. Для продолжения работы была создана пустая таблица.");
         } catch (SQLException e) {
@@ -90,7 +90,7 @@ public class CollectionElementsManager {
         try {
             statement = connection.createStatement();
             statement.executeUpdate("create table mininginstrument(item_id serial primary key unique, loc_id integer not null, item_name varchar(50) not null, " +
-                    "power_coefficient real not null, foreign key (loc_id) references location(loc_id) on delete cascade)");
+                    "power_coefficient real not null, icon bytea, foreign key (loc_id) references location(loc_id) on delete cascade)");
             statement.close();
             System.out.println("Таблица предметов MiningInstrument не была обнаружена. Для продолжения работы была создана пустая таблица.");
         } catch (SQLException e) {
@@ -108,9 +108,9 @@ public class CollectionElementsManager {
         try {
             statement = connection.createStatement();
             statement.executeUpdate("create table hammer(item_id serial primary key unique, loc_id integer not null, item_name varchar(50) not null, " +
-                    "head instrument_material not null, handle instrument_material not null, foreign key (loc_id) references location(loc_id) on delete cascade);");
+                    "head instrument_material not null, handle instrument_material not null, icon bytea, foreign key (loc_id) references location(loc_id) on delete cascade);");
             statement.close();
-            System.out.println("Таблица предметов MiningInstrument не была обнаружена. Для продолжения работы была создана пустая таблица.");
+            System.out.println("Таблица предметов Hammer не была обнаружена. Для продолжения работы была создана пустая таблица.");
         } catch (SQLException e) {
             if (!e.getSQLState().equals("42P07"))
                 throw e;

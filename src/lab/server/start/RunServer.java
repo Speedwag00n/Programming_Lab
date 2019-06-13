@@ -1,6 +1,7 @@
 package lab.server.start;
 
-import lab.locations.Location;
+import lab.server.database.changes.DatabaseChange;
+import lab.server.database.changes.DatabaseChangePublisher;
 import lab.server.processing.ClientID;
 import lab.server.processing.ServerProcessThread;
 import lab.util.CollectionElementsManager;
@@ -27,6 +28,8 @@ public class RunServer {
 
     private static HashMap<ClientID, ArrayList<DatagramPacket>> packetsParts = new HashMap<>();
     private static CollectionElementsManager collectionManager;
+
+    private static DatabaseChangePublisher publisher;
 
     public static void main(String[] args) {
 
@@ -56,8 +59,21 @@ public class RunServer {
             collectionManager = new CollectionElementsManager();
         } catch (Throwable e) {
             System.out.println("Не удалось установить соединение с базой данных.");
+            e.printStackTrace();
             System.exit(0);
         }
+
+        publisher = new DatabaseChangePublisher();
+        try {
+            publisher.connect();
+        } catch (SocketException e) {
+            System.out.println("Порт занят, сервер не может быть запущен");
+            return;
+        }
+
+        Thread publisherThread = new Thread(publisher);
+        publisherThread.start();
+
         while (working) {
 
             byte[] buffer = new byte[PACKET_LENGTH];
@@ -84,8 +100,8 @@ public class RunServer {
             if (clientID.isProcessing())
                 continue;
 
-            int countOfPackets = packet.getData()[0] & 0xff;
-            int currentPacketNumber = packet.getData()[1] & 0xff;
+            int countOfPackets = (packet.getData()[0] & 0xff) * 256 + (packet.getData()[1] & 0xff);
+            int currentPacketNumber = (packet.getData()[2] & 0xff) * 256 + (packet.getData()[3] & 0xff);
 
             while (packetsParts.get(clientID).size() < currentPacketNumber) {
                 packetsParts.get(clientID).add(null);
@@ -117,5 +133,12 @@ public class RunServer {
         processRequestThread.start();
     }
 
+    public static void subscribe(InetAddress inetAddress, int port) {
+        publisher.subscribe(inetAddress, port);
+    }
+
+    public static void notifyPublisher(DatabaseChange change) {
+        publisher.addChange(change);
+    }
 
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<VBox id="body-pane" fx:id="body_pane" minWidth="1280" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      stylesheets="@css/style.css">
+    <children>
+        <ScrollPane id="visualisation-view-canvas-box" fx:id="visualisation_view_canvas_box" minWidth="1280" prefWidth="3000">
+            <Pane prefHeight="9999" prefWidth="9999" id="visualisation-view-canvas-pane" fx:id="visualisation_view_canvas_pane">
+                
+            </Pane>
+        </ScrollPane>
+    </children>
+</VBox>

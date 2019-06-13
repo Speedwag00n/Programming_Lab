@@ -10,7 +10,7 @@ import java.util.*;
  * Commands class contains static methods to receive commands classes and supported methods for them.
  *
  * @author Nemankov Ilia
- * @version 1.1.0
+ * @version 1.2.0
  * @since 1.6.0
  */
 public class Commands {
@@ -29,6 +29,10 @@ public class Commands {
         commandsCodes.put("exit", 8);
         commandsCodes.put("import", 9);
         commandsCodes.put("register", 10);
+        commandsCodes.put("login", 11);
+        commandsCodes.put("subscribe", 12);
+        commandsCodes.put("get", 13);
+        commandsCodes.put("update", 14);
     }
 
     /**
@@ -44,7 +48,9 @@ public class Commands {
         CLIENT_NOT_SUCCESSFUL(5),
         CLIENT_CANT_SEND(6),
         SERVER_CANT_SEND(7),
-        NO_RESPONSE(8);
+        NO_RESPONSE(8),
+        AUTHORIZED(9),
+        SERVER_SEND_DATA(10);
 
         private int code;
 
@@ -102,32 +108,32 @@ public class Commands {
             switch (commandCode) {
                 case 0:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    return new Add(arguments[0], arguments[1], Commands.packLocation(arguments[2]));
+                    return new Add(Commands.packLocation(arguments[2]));
                 case 1:
                     return new Help(data);
                 case 2:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    return new RemoveGreater(arguments[0], arguments[1], Commands.packLocation(arguments[2]));
+                    return new RemoveGreater(Commands.packLocation(arguments[2]));
                 case 3:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    return new Show(arguments[0], arguments[1], new byte[0]);
+                    return new Show(new byte[0]);
                 case 4:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    return new Info(arguments[0], arguments[1]);
+                    return new Info();
                 case 5:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    return new RemoveLower(arguments[0], arguments[1], Commands.packLocation(arguments[2]));
+                    return new RemoveLower(Commands.packLocation(arguments[2]));
                 case 6:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    return new Remove(arguments[0], arguments[1], Commands.packLocation(arguments[2]));
+                    return new Remove(Commands.packLocation(arguments[2]));
                 case 7:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    return new AddIfMax(arguments[0], arguments[1], Commands.packLocation(arguments[2]));
+                    return new AddIfMax(Commands.packLocation(arguments[2]));
                 case 8:
                     return new Exit();
                 case 9:
                     checkLoginAndPw(arguments[0], arguments[1]);
-                    return new Import(arguments[0], arguments[1], Commands.packLocations(arguments[2]));
+                    return new Import(Commands.packLocations(arguments[2]));
                 case 10:
                     if (!Commands.isLoginValid(arguments[0])) {
                         throw new InvalidArgumentsException("Введен невалидный логин");
@@ -153,33 +159,38 @@ public class Commands {
     /**
      * Factory method that returns object of server command.
      *
-     * @param commandCode code of command .
+     * @param commandCode code of command.
      * @param data        packed data where contains command object fields.
      * @return ServerCommand object.
      */
     public static ServerCommand getServerCommand(int commandCode, byte[] data) {
-        byte[] login = Arrays.copyOfRange(data, 0, 60);
-        byte[] password = Arrays.copyOfRange(data, 60, 100);
-        byte[] argument = Arrays.copyOfRange(data, 100, data.length);
         switch (commandCode) {
             case 0:
-                return new Add(login, password, argument);
+                return new Add(data);
             case 2:
-                return new RemoveGreater(login, password, argument);
+                return new RemoveGreater(data);
             case 3:
-                return new Show(login, password, new byte[0]);
+                return new Show(new byte[0]);
             case 4:
-                return new Info(login, password);
+                return new Info();
             case 5:
-                return new RemoveLower(login, password, argument);
+                return new RemoveLower(data);
             case 6:
-                return new Remove(login, password, argument);
+                return new Remove(data);
             case 7:
-                return new AddIfMax(login, password, argument);
+                return new AddIfMax(data);
             case 9:
-                return new Import(login, password, argument);
+                return new Import(data);
             case 10:
                 return new Register(data);
+            case 11:
+                return new Login(data);
+            case 12:
+                return new Subscribe(data);
+            case 13:
+                return new Get();
+            case 14:
+                return new Update(data);
             default:
                 return null;
         }
@@ -271,7 +282,7 @@ public class Commands {
      */
     public static boolean isLoginValid(String login) {
         login = login.trim();
-        if (login.length() > 30)
+        if (login.length() > 30 || login.length() == 0)
             return false;
         for (char ch : login.toCharArray()) {
             if (!Character.isLetter(ch) && !Character.isDigit(ch))
@@ -288,7 +299,7 @@ public class Commands {
      */
     public static boolean isEmailValid(String email) {
         email = email.trim();
-        if (email.length() > 50)
+        if (email.length() > 50 || email.length() == 0)
             return false;
         if (email.indexOf("@") - email.lastIndexOf(".") >= -1 || email.indexOf("@") == 0)
             return false;
@@ -327,7 +338,7 @@ public class Commands {
      */
     public static boolean isPasswordValid(String password) {
         password = password.trim();
-        if (password.length() != 16)
+        if (password.length() != 16 || password.length() == 0)
             return false;
         for (char ch : password.toCharArray()) {
             if (!Character.isLetter(ch) && !Character.isDigit(ch))

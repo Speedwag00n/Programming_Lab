@@ -14,10 +14,10 @@ import java.util.List;
 /**
  * Class of location that contains items
  * * @author Nemankov Ilia
- * * @version 1.0.0
+ * * @version 1.3.0
  * * @since 1.3.0
  */
-public class Location implements Named, ContainsItems, Comparable<Location>, Serializable {
+public class Location implements Named, ContainsItems, Comparable<Location>, Serializable, Cloneable {
 
     private String name = "Безымянный";
     private ArrayList<Item> itemsList = new ArrayList<>();
@@ -83,12 +83,30 @@ public class Location implements Named, ContainsItems, Comparable<Location>, Ser
     }
 
     /**
+     * Sets area of location.
+     *
+     * @param area area of location.
+     */
+    public void setArea(int area) {
+        this.area = area;
+    }
+
+    /**
      * Getter for receive position of location.
      *
      * @return position of location.
      */
     public RectanglePosition getPosition() {
         return position;
+    }
+
+    /**
+     * Sets position of location.
+     *
+     * @param position position of location.
+     */
+    public void setPosition(RectanglePosition position) {
+        this.position = position;
     }
 
     /**
@@ -126,9 +144,6 @@ public class Location implements Named, ContainsItems, Comparable<Location>, Ser
      */
     public void addItem(Item item) {
         if (item != null) {
-            if (item.getLocation() != null) {
-                item.getLocation().delItemByReference(item);
-            }
             itemsList.add(item);
             item.setLocation(this);
         }
@@ -165,7 +180,6 @@ public class Location implements Named, ContainsItems, Comparable<Location>, Ser
      */
     public void clearItems() {
         itemsList = new ArrayList<>();
-        System.out.println("Локация " + getName() + " теперь пуста.");
     }
 
     /**
@@ -256,6 +270,8 @@ public class Location implements Named, ContainsItems, Comparable<Location>, Ser
             return false;
         if (!itemsList.equals(object.itemsList))
             return false;
+        if (!dateOfCreation.equals(object.dateOfCreation)) //Added in Lab8
+            return false;                                  //Caused by replacing command line by UI
         if (!owner.equals(object.owner))
             return false;
         return true;
@@ -263,7 +279,7 @@ public class Location implements Named, ContainsItems, Comparable<Location>, Ser
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
         return "Локация " + getName() + ". Количество предметов в локации: " + itemsList.size() + ". Площадь "
                 + getArea() + ". Позиция: " + getPosition().toString() + ". Дата создания: " + formatter.format(getDateOfCreation()) + ".";
     }

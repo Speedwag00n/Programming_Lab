@@ -3,8 +3,6 @@ package lab.util.commands;
 import lab.locations.Location;
 import lab.objects.items.Item;
 import lab.server.database.DatabaseElementsBuilder;
-import lab.server.database.PasswordsGenerator;
-import lab.server.response.Logger;
 import lab.util.CollectionElementsManager;
 
 import java.sql.Connection;
@@ -22,40 +20,18 @@ import java.util.List;
  */
 public abstract class DBCommand extends ServerCommand {
 
-    private String login = "";
-    private String password = "";
-
     private CollectionElementsManager elementsManager;
     private Connection connection;
 
     /**
-     * Constructor of DBCommand that receives login and password from command line.
-     *
-     * @param login    login to auth in database.
-     * @param password password to auth in database.
-     * @param argument argument of command.
+     * Constructor of DBCommand without argument.
      */
-    public DBCommand(String login, String password, byte[] argument) {
-        super(argument);
-        this.login = login;
-        this.password = password;
+    public DBCommand(){
+        super();
     }
 
     /**
-     * Constructor of DBCommand that receives login and password from UDP package.
-     *
-     * @param login    login to auth in database.
-     * @param password password to auth in database.
-     * @param argument argument of command.
-     */
-    public DBCommand(byte[] login, byte[] password, byte[] argument) {
-        super(argument);
-        this.login = new String(login).trim();
-        this.password = new String(password).trim();
-    }
-
-    /**
-     * Constructor of DBCommand that can work with database without auth.
+     * Constructor of DBCommand with argument.
      *
      * @param argument argument of command.
      */
@@ -111,69 +87,6 @@ public abstract class DBCommand extends ServerCommand {
     }
 
     /**
-     * Getter of login.
-     *
-     * @return login.
-     */
-    public String getLogin() {
-        return login;
-    }
-
-    @Override
-    public byte[] getPackedData() {
-        byte[] previousData = super.getPackedData();
-        byte[] data = new byte[60 + 40 + previousData.length];
-        int offset = 0;
-        byte space = " ".getBytes()[0];
-        byte[] currentData = login.getBytes();
-        for (int i = 0; i < currentData.length; i++) {
-            data[offset + i] = currentData[i];
-        }
-        for (int i = currentData.length; i < 60; i++) {
-            data[offset + i] = space;
-        }
-        offset += 60;
-        currentData = password.getBytes();
-        for (int i = 0; i < currentData.length; i++) {
-            data[offset + i] = currentData[i];
-        }
-        for (int i = currentData.length; i < 40; i++) {
-            data[offset + i] = space;
-        }
-        offset += 40;
-        currentData = getPackedArgument();
-        for (int i = 0; i < currentData.length; i++) {
-            data[offset + i] = currentData[i];
-        }
-        return data;
-    }
-
-    /**
-     * Try to auth in database using specified login and password of current command object.
-     *
-     * @return true if auth was successful else false.
-     */
-    public boolean authorization() {
-        Logger logger = getLogger();
-        if (Commands.isLoginValid(login) && Commands.isPasswordValid(password)) {
-            PasswordsGenerator passwordsGenerator = new PasswordsGenerator();
-            try (PreparedStatement statement = getConnection().prepareStatement("SELECT Login FROM Users WHERE Login LIKE ? AND Password LIKE ?")) {
-                statement.setString(1, login);
-                statement.setString(2, passwordsGenerator.encode(password));
-                ResultSet rs = statement.executeQuery();
-                if (rs.next()) {
-                    logger.append("Авторизация прошла успешно.");
-                    return true;
-                }
-            } catch (SQLException e) {
-
-            }
-        }
-        logger.append("Авторизация не удалась. Проверьте правильность введенного логина и пароля.");
-        return false;
-    }
-
-    /**
      * Adds all location in list to collection.
      *
      * @param locations list of location that need to be added.
@@ -198,6 +111,7 @@ public abstract class DBCommand extends ServerCommand {
             getConnection().commit();
             return true;
         } catch (SQLException e) {
+            e.printStackTrace();
             try {
                 getConnection().rollback();
             } catch (SQLException e1) {
@@ -225,6 +139,36 @@ public abstract class DBCommand extends ServerCommand {
             return true;
         } catch (SQLException e) {
 
+            try {
+                getConnection().rollback();
+            } catch (SQLException e1) {
+
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Update location in database founded by id.
+     *
+     * @param id id of location in database that needs to be changed
+     * @param newLocation location from that will get new attributes.
+     * @return true if updating of location was successful else false.
+     */
+    public boolean updateLocationInDB(int id, Location newLocation) {
+        try {
+            PreparedStatement statement = DatabaseElementsBuilder.getUpdateLocationStatement(newLocation, getConnection(), id);
+            statement.executeUpdate();
+            DatabaseElementsBuilder.getClearItemsStatement(connection, id);
+            for (Item item : newLocation.getItems()) {
+                statement = DatabaseElementsBuilder.getAddItemStatement(item, connection, id);
+                statement.executeUpdate();
+            }
+            statement.close();
+            getConnection().commit();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
             try {
                 getConnection().rollback();
             } catch (SQLException e1) {

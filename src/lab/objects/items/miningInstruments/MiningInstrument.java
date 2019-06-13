@@ -1,8 +1,10 @@
 package lab.objects.items.miningInstruments;
 
+import lab.client.settings.Settings;
 import lab.objects.items.Item;
 
 import java.io.Serializable;
+import java.util.ResourceBundle;
 
 /**
  * Mining instrument item class.
@@ -118,6 +120,15 @@ public class MiningInstrument extends Item implements Serializable {
             throw new IncorrectPowerCoefficientException("Введите корректный коэффициент для инструмента!", aPowerCoefficient);
         else
             powerCoefficient = aPowerCoefficient;
+    }
+
+    @Override
+    public String getAttributesDescription() {
+        ResourceBundle resources = ResourceBundle.getBundle("resources.lang.lang", Settings.getLocale());
+        StringBuilder description = new StringBuilder();
+        description.append(resources.getString("object_item_mininginstrument_coefficient") + ": " + powerCoefficient + " ");
+
+        return description.toString();
     }
 
     @Override

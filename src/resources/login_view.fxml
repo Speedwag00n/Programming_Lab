@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane id="body-pane" fx:id="body_pane" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@css/style.css">
+    <children>
+        <GridPane id="main-pane" fx:id="main_pane" AnchorPane.topAnchor="120" AnchorPane.rightAnchor="240" AnchorPane.bottomAnchor="120" AnchorPane.leftAnchor="240">
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints percentHeight="20"/>
+                <RowConstraints percentHeight="40"/>
+                <RowConstraints percentHeight="20"/>
+                <RowConstraints percentHeight="20"/>
+            </rowConstraints>
+            <children>
+                <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label id="login-pane-title" fx:id="login_pane_title" styleClass="title-18" alignment="CENTER"
+                           text="%login_pane_title" minWidth="${main_pane.width * 0.375}" maxWidth="Infinity">
+                        <HBox.margin>
+                            <Insets top="20"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+                <VBox  GridPane.columnIndex="0" GridPane.rowIndex="1" alignment="CENTER">
+                    <HBox alignment="CENTER">
+                        <VBox.margin>
+                            <Insets top="40"/>
+                        </VBox.margin>
+                        <children>
+                            <Label id="login-pane-login-label" fx:id="login_pane_login_label" styleClass="label-18" alignment="CENTER" textAlignment="CENTER"
+                                   text="%login_pane_login_label" wrapText="true" minWidth="${main_pane.width * 0.2}" maxWidth="${main_pane.width * 0.4}">
+                                <HBox.margin>
+                                    <Insets left="40" right="40"/>
+                                </HBox.margin>
+                            </Label>
+                            <TextField id="login-field" fx:id="login_field" styleClass="input-field-18" HBox.hgrow="ALWAYS">
+                                <HBox.margin>
+                                    <Insets right="40"/>
+                                </HBox.margin>
+                            </TextField>
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER">
+                        <VBox.margin>
+                            <Insets top="40"/>
+                        </VBox.margin>
+                        <children>
+                            <Label id="login-pane-password-label" fx:id="login_pane_password_label" styleClass="label-18" alignment="CENTER" textAlignment="CENTER"
+                                   text="%login_pane_password_label" wrapText="true" minWidth="${main_pane.width * 0.2}" maxWidth="${main_pane.width * 0.4}">
+                                <HBox.margin>
+                                    <Insets left="40" right="40"/>
+                                </HBox.margin>
+                            </Label>
+                            <PasswordField id="password-field" fx:id="password_field" styleClass="input-field-18" HBox.hgrow="ALWAYS">
+                                <HBox.margin>
+                                    <Insets right="40"/>
+                                </HBox.margin>
+                            </PasswordField>
+                        </children>
+                    </HBox>
+                </VBox>
+                <HBox alignment="CENTER"  GridPane.columnIndex="0" GridPane.rowIndex="2" fx:id="login_pane_login_button_box">
+                    <Button id="login-pane-login-button" fx:id="login_pane_login_button" styleClass="button-18" text="%login_pane_login_button"
+                            minWidth="${main_pane.width * 0.25}" maxWidth="Infinity" onMouseClicked="#onLoginButtonClick">
+                        <HBox.margin>
+                            <Insets top="40" bottom="20"/>
+                        </HBox.margin>
+                    </Button>
+                </HBox>
+                <HBox alignment="CENTER"  GridPane.columnIndex="0" GridPane.rowIndex="3">
+                    <Label id="login-pane-errors-label" fx:id="login_pane_errors_label" styleClass="error-label-16"
+                           alignment="CENTER" textAlignment="CENTER" wrapText="true" minWidth="720" prefWidth="${main_pane.width - 40 - 40}">
+                        <HBox.margin>
+                            <Insets top="20" bottom="20" left="40" right="40"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+            </children>
+        </GridPane>
+    </children>
+</AnchorPane>

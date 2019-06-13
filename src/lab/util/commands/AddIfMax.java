@@ -1,7 +1,9 @@
 package lab.util.commands;
 
 import lab.locations.Location;
+import lab.server.database.changes.DatabaseChange;
 import lab.server.response.Logger;
+import lab.server.start.RunServer;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -16,19 +18,12 @@ import java.util.List;
  */
 public class AddIfMax extends DBCommand {
 
-    public AddIfMax(String login, String password, byte[] argument) {
-        super(login, password, argument);
-    }
-
-    public AddIfMax(byte[] login, byte[] password, byte[] argument) {
-        super(login, password, argument);
+    public AddIfMax(byte[] argument) {
+        super(argument);
     }
 
     @Override
     public Commands.CommandExecutionStatus execute() {
-        if (!authorization()) {
-            return Commands.CommandExecutionStatus.NOT_LOGGED_NOT_SUCCESSFUL;
-        }
         Logger logger = getLogger();
         List<Location> locations = Commands.unpackLocations(getPackedArgument());
         if (locations.size() == 0) {
@@ -44,6 +39,12 @@ public class AddIfMax extends DBCommand {
             if ((getElementsManager().getMaxElement() == null) || (location.compareTo(getElementsManager().getMaxElement()) > 0)) {
                 if (addLocationToDB(locations)) {
                     collection.add(location);
+
+                    List<Location> addedLocations = new ArrayList<>();
+                    addedLocations.add(location);
+                    DatabaseChange change = new DatabaseChange(DatabaseChange.ChangeType.ADDED, addedLocations, getLogin());
+                    RunServer.notifyPublisher(change);
+
                     logger.append("Элемент оказался наибольшим и был добавлен в коллекцию.");
                     return Commands.CommandExecutionStatus.LOGGED_SUCCESSFUL;
                 }
@@ -59,6 +60,11 @@ public class AddIfMax extends DBCommand {
     @Override
     public int getCode() {
         return Commands.getCommandCode("add_if_max");
+    }
+
+    @Override
+    public boolean needBeAuthorized(){
+        return true;
     }
 
 }

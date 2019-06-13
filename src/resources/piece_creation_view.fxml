@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.*?>
+<AnchorPane id="body_pane" fx:id="body_pane" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@css/style.css">
+    <children>
+        <GridPane AnchorPane.topAnchor="30" AnchorPane.rightAnchor="30" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="30">
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="65"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="35"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints percentHeight="100"/>
+            </rowConstraints>
+            <children>
+                <GridPane id="main-pane" fx:id="main_pane" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <GridPane.margin>
+                        <Insets right="40"/>
+                    </GridPane.margin>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints prefHeight="${body_pane.height * 0.1}"/>
+                        <RowConstraints prefHeight="${body_pane.height * 0.6}"/>
+                        <RowConstraints prefHeight="${body_pane.height * 0.15}"/>
+                        <RowConstraints prefHeight="${body_pane.height * 0.15}"/>
+                    </rowConstraints>
+                    <children>
+                        <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label id="item-creation-pane-title" fx:id="item_creation_pane_title" styleClass="title-18" alignment="CENTER"
+                                   text="%item_creation_pane_title" textAlignment="CENTER" wrapText="true" minWidth="${main_pane.width * 0.5}" maxWidth="Infinity">
+                                <HBox.margin>
+                                    <Insets top="20"/>
+                                </HBox.margin>
+                            </Label>
+                        </HBox>
+                        <VBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <HBox alignment="CENTER_LEFT">
+                                <VBox.margin>
+                                    <Insets top="40"/>
+                                </VBox.margin>
+                                <children>
+                                    <MenuBar id="items-menu" fx:id="items_menu">
+                                        <HBox.margin>
+                                            <Insets left="40" right="40"/>
+                                        </HBox.margin>
+                                        <menus>
+                                            <Menu id="items-menu-title" fx:id="items_menu_title">
+                                                <items>
+                                                    <MenuItem text="%items_menu_piece" fx:id="items_menu_piece" onAction="#onPieceMenuSelected"/>
+                                                    <MenuItem text="%items_menu_rock" fx:id="items_menu_rock" onAction="#onRockMenuSelected"/>
+                                                    <MenuItem text="%items_menu_mining_instrument" fx:id="items_menu_mining_instrument" onAction="#onMiningInstrumentMenuSelected"/>
+                                                    <MenuItem text="%items_menu_hammer" fx:id="items_menu_hammer" onAction="#onHammerMenuSelected"/>
+                                                </items>
+                                            </Menu>
+                                        </menus>
+                                    </MenuBar>
+                                </children>
+                            </HBox>
+                            <HBox alignment="CENTER">
+                                <VBox.margin>
+                                    <Insets left="40" top="20" right="40"/>
+                                </VBox.margin>
+                                <children>
+                                    <Label id="piece-creation-pane-name-label" fx:id="piece_creation_pane_name_label" styleClass="label-18" alignment="CENTER"
+                                           text="%piece_creation_pane_name_label" textAlignment="CENTER" wrapText="true" minWidth="${main_pane.width * 0.2}" maxWidth="${main_pane.width * 0.4}"/>
+                                    <TextField id="piece-creation-pane-name-field" fx:id="piece_creation_pane_name_field" styleClass="input-field-18" HBox.hgrow="ALWAYS">
+                                        <HBox.margin>
+                                            <Insets left="40"/>
+                                        </HBox.margin>
+                                    </TextField>
+                                </children>
+                            </HBox>
+                            <HBox alignment="CENTER">
+                                <VBox.margin>
+                                    <Insets left="40" top="20" right="40"/>
+                                </VBox.margin>
+                                <children>
+                                    <Label id="piece-creation-pane-weight-label" fx:id="piece_creation_pane_weight_label" styleClass="label-18" alignment="CENTER"
+                                           text="%piece_creation_pane_weight_label" textAlignment="CENTER" wrapText="true" minWidth="${main_pane.width * 0.2}" maxWidth="${main_pane.width * 0.4}"/>
+                                    <TextField id="piece-creation-pane-weight-field" fx:id="piece_creation_pane_weight_field" styleClass="input-field-18" HBox.hgrow="ALWAYS">
+                                        <HBox.margin>
+                                            <Insets left="40"/>
+                                        </HBox.margin>
+                                    </TextField>
+                                </children>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT">
+                                <VBox.margin>
+                                    <Insets left="40" top="20" right="40"/>
+                                </VBox.margin>
+                                <Button id="creation-pane-image-chooser" fx:id="creation_pane_image_chooser" styleClass="button-18"
+                                        text="%creation_pane_image_chooser" prefWidth="${main_pane.width * 0.25}" maxWidth="${main_pane.width * 0.25}"/>
+                                <Label id="creation-pane-image-chooser-path-label" fx:id="creation_pane_image_chooser_path_label" styleClass="label-18" alignment="CENTER_LEFT"
+                                       textAlignment="LEFT" wrapText="true" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets left="40"/>
+                                    </HBox.margin>
+                                </Label>
+                            </HBox>
+                        </VBox>
+                        <GridPane GridPane.columnIndex="0" GridPane.rowIndex="2">
+                            <GridPane.margin>
+                                <Insets top="40" bottom="20" left="40" right="40"/>
+                            </GridPane.margin>
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints percentHeight="100"/>
+                            </rowConstraints>
+                            <children>
+                                <HBox GridPane.columnIndex="0" GridPane.rowIndex="0" alignment="BASELINE_LEFT">
+                                    <Button id="item-creation-pane-back-button" fx:id="item_creation_pane_back_button" styleClass="button-18"
+                                            text="%item_creation_pane_back_button" prefWidth="${main_pane.width * 0.25}" maxWidth="${main_pane.width * 0.25}"
+                                            AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" onMouseClicked="#onBackButtonClick"/>
+                                </HBox>
+                                <HBox GridPane.columnIndex="1" GridPane.rowIndex="0" alignment="BASELINE_CENTER">
+                                    <Button id="item-creation-pane-add-button" fx:id="item_creation_pane_add_button" styleClass="button-18"
+                                            text="%item_creation_pane_add_button" prefWidth="${main_pane.width * 0.25}" maxWidth="${main_pane.width * 0.25}"
+                                            AnchorPane.topAnchor="0" onMouseClicked="#onAddButtonClick"/>
+                                </HBox>
+                                <HBox GridPane.columnIndex="2" GridPane.rowIndex="0" alignment="BASELINE_RIGHT">
+                                    <Button id="item-creation-pane-create-button" fx:id="item_creation_pane_create_button" styleClass="button-18"
+                                            prefWidth="${main_pane.width * 0.25}" maxWidth="${main_pane.width * 0.25}"
+                                            AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" onMouseClicked="#onCreateButtonClick"/>
+                                </HBox>
+                            </children>
+                        </GridPane>
+                        <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                            <Label id="location-creation-pane-errors-label" fx:id="location_creation_pane_errors_label" styleClass="error-label-16"
+                                   text="%location_creation_pane_creation_hint" alignment="CENTER" textAlignment="CENTER" wrapText="true" minWidth="720" prefWidth="${main_pane.width - 40 - 40}">
+                                <HBox.margin>
+                                    <Insets top="20" bottom="20" left="40" right="40"/>
+                                </HBox.margin>
+                            </Label>
+                        </HBox>
+                    </children>
+                </GridPane>
+                <VBox id="items-list-pane" fx:id="items_list_pane" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <HBox.margin>
+                        <Insets left="40"/>
+                    </HBox.margin>
+                    <children>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label id="items-list-pane-title" fx:id="items_list_pane_title" styleClass="title-18" alignment="CENTER"
+                                       text="%items_list_pane_title" textAlignment="CENTER" wrapText="true" minWidth="${items_list_pane.width * 0.75}" maxWidth="Infinity">
+                                    <HBox.margin>
+                                        <Insets top="20"/>
+                                    </HBox.margin>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <AnchorPane VBox.vgrow="ALWAYS">
+                            <children>
+                                <TableView fx:id="items_table" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="20" AnchorPane.bottomAnchor="0" styleClass="items-table-view" minWidth="380">
+                                    <columns>
+                                        <TableColumn minWidth="360" prefWidth="${items_table.width - 20}" sortable="false" resizable="false" styleClass="items-table-header-column">
+                                            <graphic>
+                                                <Label id="items-list-table-header-name" fx:id="items_list_table_header_name" styleClass="header-label-18" alignment="CENTER"
+                                                       text="%items_list_table_header_name" minWidth="360" prefWidth="${items_table.width - 20}"/>
+                                            </graphic>
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="name"/>
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                    </columns>
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+
+                                        </FXCollections>
+                                    </items>
+                                </TableView>
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </VBox>
+            </children>
+        </GridPane>
+    </children>
+</AnchorPane>

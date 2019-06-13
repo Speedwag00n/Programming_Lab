@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<HBox id="header-pane" fx:id="header_pane" alignment="CENTER_RIGHT" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="lab.client.mvc.controller.NotAuthorizedHeaderController"
+      stylesheets="@css/style.css">
+    <children>
+        <Button id="settings-button" fx:id="settings_button" styleClass="image-button" onMouseClicked="#onSettingsButtonClick">
+            <HBox.margin>
+                <Insets right="20"/>
+            </HBox.margin>
+        </Button>
+        <Button id="registration-button" fx:id="registration_button" styleClass="button-18" text="%header_registration_button" minWidth="${header_pane.width * 0.125}" maxWidth="Infinity" onMouseClicked="#onRegistrationButtonClick">
+            <HBox.margin>
+                <Insets right="20"/>
+            </HBox.margin>
+        </Button>
+        <Button id="auth-button" fx:id="auth_button" styleClass="button-18" text="%header_login_button" minWidth="${header_pane.width * 0.125}" maxWidth="Infinity" onMouseClicked="#onLoginButtonClick">
+            <HBox.margin>
+                <Insets right="30"/>
+            </HBox.margin>
+        </Button>
+        <Button id="exit-button" fx:id="exit_button" styleClass="button-18" text="%header_exit_button" minWidth="${header_pane.width * 0.0625}" maxWidth="Infinity" onMouseClicked="#onExitButtonClick">
+            <HBox.margin>
+                <Insets right="30"/>
+            </HBox.margin>
+        </Button>
+    </children>
+</HBox>

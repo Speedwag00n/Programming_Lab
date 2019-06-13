@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane id="header-pane" fx:id="header_pane" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="lab.client.mvc.controller.AuthorizedHeaderController"
+            stylesheets="@css/style.css">
+    <children>
+        <HBox AnchorPane.leftAnchor="30" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" alignment="CENTER_LEFT">
+            <MenuBar id="views-menu" fx:id="views_menu">
+                <menus>
+                    <Menu text="%views_menu_menu">
+                        <items>
+                            <MenuItem text="%views_menu_table" fx:id="views_menu_table" onAction="#onTableButtonClick"/>
+                            <MenuItem text="%views_menu_visualisation" fx:id="views_menu_visualisation" onAction="#onVisualisationButtonClick"/>
+                            <MenuItem text="%views_menu_creation" fx:id="views_menu_creation" onAction="#onCreationButtonClick"/>
+                        </items>
+                    </Menu>
+                </menus>
+            </MenuBar>
+        </HBox>
+        <HBox AnchorPane.rightAnchor="30" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" alignment="CENTER_RIGHT">
+            <Label id="greetings-label" fx:id="greetings_label" styleClass="label-dark-18" alignment="CENTER" minWidth="${header_pane.width * 0.125}" maxWidth="Infinity">
+                <HBox.margin>
+                    <Insets right="20"/>
+                </HBox.margin>
+            </Label>
+            <Button id="settings-button" fx:id="settings_button" styleClass="image-button" onMouseClicked="#onSettingsButtonClick">
+                <HBox.margin>
+                    <Insets right="20"/>
+                </HBox.margin>
+            </Button>
+            <Button id="logout-button" fx:id="logout_button" styleClass="button-18" text="%header_logout_button"
+                    minWidth="${header_pane.width * 0.125}" maxWidth="Infinity" onMouseClicked="#onLogoutButtonClick"/>
+        </HBox>
+    </children>
+</AnchorPane>

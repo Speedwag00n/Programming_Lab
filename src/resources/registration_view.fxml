@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane id="body-pane" fx:id="body_pane" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="lab.client.mvc.controller.RegistrationController"
+            stylesheets="@css/style.css">
+    <children>
+        <GridPane id="main-pane" fx:id="main_pane" AnchorPane.topAnchor="120" AnchorPane.rightAnchor="240" AnchorPane.bottomAnchor="120" AnchorPane.leftAnchor="240">
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints percentHeight="20"/>
+                <RowConstraints percentHeight="40"/>
+                <RowConstraints percentHeight="20"/>
+                <RowConstraints percentHeight="20"/>
+            </rowConstraints>
+            <children>
+                <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label id="registration-pane-title" fx:id="registration_pane_title" styleClass="title-18" alignment="CENTER"
+                           text="%registration_pane_title" minWidth="${main_pane.width * 0.375}" maxWidth="Infinity">
+                        <HBox.margin>
+                            <Insets top="20"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+                <VBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <GridPane.margin>
+                        <Insets top="40"/>
+                    </GridPane.margin>
+                    <HBox>
+                        <children>
+                            <Label id="registration-pane-login-label" fx:id="registration_pane_login_label" styleClass="label-18" alignment="CENTER" textAlignment="CENTER"
+                                   text="%registration_pane_login_label" wrapText="true" minWidth="${main_pane.width * 0.2}" maxWidth="${main_pane.width * 0.4}">
+                                <HBox.margin>
+                                    <Insets left="40" right="40"/>
+                                </HBox.margin>
+                            </Label>
+                            <TextField id="login-field" fx:id="login_field" styleClass="input-field-18" HBox.hgrow="ALWAYS">
+                                <HBox.margin>
+                                    <Insets right="40"/>
+                                </HBox.margin>
+                            </TextField>
+                        </children>
+                    </HBox>
+                    <HBox>
+                        <VBox.margin>
+                            <Insets top="20"/>
+                        </VBox.margin>
+                        <children>
+                            <Label id="registration-pane-login-hint" fx:id="registration_pane_login_hint" styleClass="hint-label-12" alignment="BASELINE_LEFT" textAlignment="LEFT"
+                                   text="%registration_pane_login_hint" wrapText="true" minWidth="720" prefWidth="${main_pane.width - 40 - 40}">
+                                <HBox.margin>
+                                    <Insets left="40" right="40"/>
+                                </HBox.margin>
+                            </Label>
+                        </children>
+                    </HBox>
+                    <HBox>
+                        <VBox.margin>
+                            <Insets top="40"/>
+                        </VBox.margin>
+                        <children>
+                            <Label id="registration-pane-email-label" fx:id="registration_pane_email_label" styleClass="label-18" alignment="CENTER" textAlignment="LEFT"
+                                   text="%registration_pane_email_label" wrapText="true" minWidth="${main_pane.width * 0.2}" maxWidth="${main_pane.width * 0.4}">
+                                <HBox.margin>
+                                    <Insets left="40" right="40"/>
+                                </HBox.margin>
+                            </Label>
+                            <TextField id="email-field" fx:id="email_field" styleClass="input-field-18" HBox.hgrow="ALWAYS">
+                                <HBox.margin>
+                                    <Insets right="40"/>
+                                </HBox.margin>
+                            </TextField>
+                        </children>
+                    </HBox>
+                </VBox>
+                <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                    <Button id="registration-pane-login-button" fx:id="registration_pane_login_button" styleClass="button-18"
+                            text="%registration_pane_register_button" minWidth="${main_pane.width * 0.25}" maxWidth="Infinity" onMouseClicked="#onRegisterButtonClick">
+                        <HBox.margin>
+                            <Insets top="40" bottom="20"/>
+                        </HBox.margin>
+                    </Button>
+                </HBox>
+                <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                    <Label id="registration-pane-errors-label" fx:id="registration_pane_errors_label" styleClass="error-label-16"
+                           text="%registration_pane_register_hint" alignment="CENTER" textAlignment="CENTER" wrapText="true" minWidth="720" prefWidth="${main_pane.width - 40 - 40}">
+                        <HBox.margin>
+                            <Insets top="20" bottom="20" left="40" right="40"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+            </children>
+        </GridPane>
+    </children>
+</AnchorPane>

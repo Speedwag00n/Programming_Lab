@@ -65,4 +65,9 @@ public class Register extends DBCommand {
         return Commands.getCommandCode("register");
     }
 
+    @Override
+    public boolean needBeAuthorized(){
+        return false;
+    }
+
 }

@@ -1,8 +1,10 @@
 package lab.objects.items.miningInstruments;
 
+import lab.client.settings.Settings;
 import lab.objects.items.Item;
 
 import java.io.Serializable;
+import java.util.ResourceBundle;
 
 /**
  * Hammer item class.
@@ -200,6 +202,33 @@ public class Hammer extends MiningInstrument implements Serializable {
      */
     public String getHandleMaterialName() {
         return handle.getMaterial().fromMaterialToString();
+    }
+
+    /**
+     * Method that returns hammer head material.
+     *
+     * @return hammer head material.
+     */
+    public Material getHeadMaterial() {
+        return head.getMaterial();
+    }
+
+    /**
+     * Method that returns hammer handle material.
+     *
+     * @return hammer handle material.
+     */
+    public Material getHandleMaterial() {
+        return handle.getMaterial();
+    }
+
+    @Override
+    public String getAttributesDescription() {
+        ResourceBundle resources = ResourceBundle.getBundle("resources.lang.lang", Settings.getLocale());
+        StringBuilder description = new StringBuilder();
+        description.append(resources.getString("object_item_hammer_head_name") + ": " + resources.getString("head_material_combo_box_" + head.material.fromMaterialToString().toLowerCase()) + " ");
+        description.append(resources.getString("object_item_hammer_handle_name") + ": " + resources.getString("head_material_combo_box_" + head.material.fromMaterialToString().toLowerCase()) + " ");
+        return description.toString();
     }
 
     @Override

@@ -1,7 +1,9 @@
 package lab.util.commands;
 
 import lab.locations.Location;
+import lab.server.database.changes.DatabaseChange;
 import lab.server.response.Logger;
+import lab.server.start.RunServer;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -16,19 +18,12 @@ import java.util.List;
  */
 public class Add extends DBCommand {
 
-    public Add(String login, String password, byte[] argument) {
-        super(login, password, argument);
-    }
-
-    public Add(byte[] login, byte[] password, byte[] argument) {
-        super(login, password, argument);
+    public Add(byte[] argument) {
+        super(argument);
     }
 
     @Override
     public Commands.CommandExecutionStatus execute() {
-        if (!authorization()) {
-            return Commands.CommandExecutionStatus.NOT_LOGGED_NOT_SUCCESSFUL;
-        }
         Logger logger = getLogger();
         List<Location> locations = Commands.unpackLocations(getPackedArgument());
         if (locations.size() == 0) {
@@ -43,6 +38,12 @@ public class Add extends DBCommand {
         synchronized (collection) {
             if (addLocationToDB(locations)) {
                 collection.add(location);
+
+                List<Location> addedLocations = new ArrayList<>();
+                addedLocations.add(location);
+                DatabaseChange change = new DatabaseChange(DatabaseChange.ChangeType.ADDED, addedLocations, getLogin());
+                RunServer.notifyPublisher(change);
+
                 logger.append("Объект успешно добавлен.");
                 return Commands.CommandExecutionStatus.LOGGED_SUCCESSFUL;
             }
@@ -54,6 +55,11 @@ public class Add extends DBCommand {
     @Override
     public int getCode() {
         return Commands.getCommandCode("add");
+    }
+
+    @Override
+    public boolean needBeAuthorized(){
+        return true;
     }
 
 }

@@ -13,19 +13,12 @@ import java.text.SimpleDateFormat;
  */
 public class Info extends DBCommand {
 
-    public Info(String login, String password) {
-        super(login, password, new byte[0]);
-    }
-
-    public Info(byte[] login, byte[] password) {
-        super(login, password, new byte[0]);
+    public Info() {
+        super(new byte[0]);
     }
 
     @Override
     public Commands.CommandExecutionStatus execute() {
-        if (!authorization()) {
-            return Commands.CommandExecutionStatus.NOT_LOGGED_NOT_SUCCESSFUL;
-        }
         Logger logger = getLogger();
         SimpleDateFormat formater = new SimpleDateFormat("dd.MM.yyyy, в hh:mm:ss");
         logger.append("Программа хранит объекты класса Location, содержащие классы Item, в коллекции типа ConcurrentLinkedDeque");
@@ -36,6 +29,11 @@ public class Info extends DBCommand {
     @Override
     public int getCode() {
         return Commands.getCommandCode("info");
+    }
+
+    @Override
+    public boolean needBeAuthorized(){
+        return true;
     }
 
 }

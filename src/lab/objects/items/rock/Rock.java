@@ -1,11 +1,13 @@
 package lab.objects.items.rock;
 
+import lab.client.settings.Settings;
 import lab.objects.items.Item;
 import lab.objects.items.NegativeWeightException;
 import lab.skills.MiningSourceException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * Rock item class.
@@ -126,6 +128,16 @@ public class Rock extends Item implements Minable, Serializable {
     }
 
     @Override
+    public String getAttributesDescription() {
+        ResourceBundle resources = ResourceBundle.getBundle("resources.lang.lang", Settings.getLocale());
+        StringBuilder description = new StringBuilder();
+        description.append(resources.getString("object_item_rock_stone_weight") + ": " + weightOfStone + " ");
+        description.append(resources.getString("object_item_rock_ore_weight") + ": " + weightOfOre + " ");
+
+        return description.toString();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!super.equals(obj))
             return false;
@@ -209,6 +221,15 @@ public class Rock extends Item implements Minable, Serializable {
                 throw new NegativeWeightException("Введите не отрицательный вес куска!", aWeight);
             else
                 weight = aWeight;
+        }
+
+        @Override
+        public String getAttributesDescription() {
+            ResourceBundle resources = ResourceBundle.getBundle("resources.lang.lang", Settings.getLocale());
+            StringBuilder description = new StringBuilder();
+            description.append(resources.getString("object_item_piece_weight") + ": " + weight + " ");
+
+            return description.toString();
         }
 
         @Override

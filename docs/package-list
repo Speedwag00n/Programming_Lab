@@ -13,7 +13,7 @@ lab.server.processing
 lab.server.response
 lab.server.start
 lab.skills
-lab.start
+lab.client.start
 lab.util
 lab.util.commands
 lab.util.packet

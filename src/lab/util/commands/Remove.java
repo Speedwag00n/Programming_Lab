@@ -1,7 +1,9 @@
 package lab.util.commands;
 
 import lab.locations.Location;
+import lab.server.database.changes.DatabaseChange;
 import lab.server.response.Logger;
+import lab.server.start.RunServer;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -16,19 +18,12 @@ import java.util.List;
  */
 public class Remove extends DBCommand {
 
-    public Remove(String login, String password, byte[] argument) {
-        super(login, password, argument);
-    }
-
-    public Remove(byte[] login, byte[] password, byte[] argument) {
-        super(login, password, argument);
+    public Remove(byte[] argument) {
+        super(argument);
     }
 
     @Override
     public Commands.CommandExecutionStatus execute() {
-        if (!authorization()) {
-            return Commands.CommandExecutionStatus.NOT_LOGGED_NOT_SUCCESSFUL;
-        }
         Logger logger = getLogger();
         List<Location> locations = Commands.unpackLocations(getPackedArgument());
         if (locations.size() == 0) {
@@ -54,6 +49,10 @@ public class Remove extends DBCommand {
             locations = new ArrayList<>();
             locations.add(deletedLocation);
             if (deleteLocationFromDB(locations)) {
+
+                DatabaseChange change = new DatabaseChange(DatabaseChange.ChangeType.REMOVED, locations, getLogin());
+                RunServer.notifyPublisher(change);
+
                 logger.append("Объект успешно удален.");
                 return Commands.CommandExecutionStatus.LOGGED_SUCCESSFUL;
             } else {
@@ -67,6 +66,11 @@ public class Remove extends DBCommand {
     @Override
     public int getCode() {
         return Commands.getCommandCode("remove");
+    }
+
+    @Override
+    public boolean needBeAuthorized(){
+        return true;
     }
 
 }

@@ -1,7 +1,9 @@
 package lab.util.commands;
 
 import lab.locations.Location;
+import lab.server.database.changes.DatabaseChange;
 import lab.server.response.Logger;
+import lab.server.start.RunServer;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -18,19 +20,12 @@ import java.util.stream.Collectors;
  */
 public class RemoveLower extends DBCommand {
 
-    public RemoveLower(String login, String password, byte[] argument) {
-        super(login, password, argument);
-    }
-
-    public RemoveLower(byte[] login, byte[] password, byte[] argument) {
-        super(login, password, argument);
+    public RemoveLower(byte[] argument) {
+        super(argument);
     }
 
     @Override
     public Commands.CommandExecutionStatus execute() {
-        if (!authorization()) {
-            return Commands.CommandExecutionStatus.NOT_LOGGED_NOT_SUCCESSFUL;
-        }
         Logger logger = getLogger();
         List<Location> locations = Commands.unpackLocations(getPackedArgument());
         if (locations.size() == 0) {
@@ -47,6 +42,10 @@ public class RemoveLower extends DBCommand {
             if (deleteLocationFromDB(deletedLocations)) {
                 getElementsManager().getCollection().removeAll(deletedLocations);
                 logger.append("Было удалено " + count + " объектов.");
+
+                DatabaseChange change = new DatabaseChange(DatabaseChange.ChangeType.REMOVED, locations, getLogin());
+                RunServer.notifyPublisher(change);
+
                 return Commands.CommandExecutionStatus.LOGGED_SUCCESSFUL;
             } else {
                 logger.append("Не удалось произвести операцию, попробуйте ещё раз.");
@@ -58,6 +57,11 @@ public class RemoveLower extends DBCommand {
     @Override
     public int getCode() {
         return Commands.getCommandCode("remove_lower");
+    }
+
+    @Override
+    public boolean needBeAuthorized(){
+        return true;
     }
 
 }
